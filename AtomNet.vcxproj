@@ -1,0 +1,125 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{FFA64690-AC17-4D57-917E-0CC91E31259B}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>AtomNet</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>.\lib\</OutDir>
+    <TargetName>$(ProjectName)-s-d</TargetName>
+    <IntDir>.\lib\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(SFML_INCLUDE);$(RAKNET_INCLUDE);$(BOOST_INCLUDE);include</AdditionalIncludeDirectories>
+      <AdditionalOptions>-D_SCL_SECURE_NO_WARNINGS %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>sfml-system-d.lib;sfml-network-d.lib;RakNet_VS2008_LibStatic_Debug_Win32.lib;winmm.lib</AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalLibraryDirectories>$(SFML_LIB_DEBUG);$(RAKNET_LIB)</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\anet\Client.h" />
+    <ClInclude Include="include\anet\ClientConnection.h" />
+    <ClInclude Include="include\anet\ClientConnections.h" />
+    <ClInclude Include="src\anet\ClientNetworkInterface.h" />
+    <ClInclude Include="include\anet\ConnectionTypes.h" />
+    <ClInclude Include="include\anet\HybridConnection.h" />
+    <ClInclude Include="include\anet\IpPort.h" />
+    <ClInclude Include="include\anet\Packet.h" />
+    <ClInclude Include="include\anet\PacketInfo.h" />
+    <ClInclude Include="include\anet\Process.h" />
+    <ClInclude Include="src\anet\HybridSocket.h" />
+    <ClInclude Include="src\anet\ServerNetworkInterface.h" />
+    <ClInclude Include="src\anet\ServerTcpConnections.h" />
+    <ClInclude Include="src\anet\ServerUdpConnections.h" />
+    <ClInclude Include="src\anet\TcpConnection.h" />
+    <ClInclude Include="src\anet\UdpConnection.h" />
+    <ClInclude Include="src\anet\UdpMessages.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\anet\Client.cpp" />
+    <ClCompile Include="src\anet\ClientConnection.cpp" />
+    <ClCompile Include="src\anet\ClientConnections.cpp" />
+    <ClCompile Include="src\anet\HybridConnection.cpp" />
+    <ClCompile Include="src\anet\HybridSocket.cpp" />
+    <ClCompile Include="src\anet\Packet_SFMLImpl.cpp" />
+    <ClCompile Include="src\anet\ServerTcpConnections.cpp" />
+    <ClCompile Include="src\anet\ServerUDPConnections_RakNet.cpp" />
+    <ClCompile Include="src\anet\TcpConnection_SFMLImpl.cpp" />
+    <ClCompile Include="src\anet\UdpConnection_RakNet.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
