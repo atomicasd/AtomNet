@@ -50,9 +50,9 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>STATICLIB;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SFML_INCLUDE);$(RAKNET_INCLUDE);$(BOOST_INCLUDE);include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MINIUPNP_INCLUDE);$(SFML_INCLUDE);$(RAKNET_INCLUDE);$(BOOST_INCLUDE);include</AdditionalIncludeDirectories>
       <AdditionalOptions>-D_SCL_SECURE_NO_WARNINGS %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
@@ -61,10 +61,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>sfml-system-d.lib;sfml-network-d.lib;RakNet_VS2008_LibStatic_Debug_Win32.lib;winmm.lib</AdditionalDependencies>
+      <AdditionalDependencies>IPHlpApi.Lib;miniupnpc.lib;sfml-system-d.lib;sfml-network-d.lib;RakNet_VS2008_LibStatic_Debug_Win32.lib;winmm.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(SFML_LIB_DEBUG);$(RAKNET_LIB)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(MINIUPNP_LIB_DEBUG);$(SFML_LIB_DEBUG);$(RAKNET_LIB)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -106,6 +106,7 @@
     <ClInclude Include="src\anet\TcpConnection.h" />
     <ClInclude Include="src\anet\UdpConnection.h" />
     <ClInclude Include="src\anet\UdpMessages.h" />
+    <ClInclude Include="src\anet\UPNPService.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\anet\Client.cpp" />
@@ -113,11 +114,12 @@
     <ClCompile Include="src\anet\ClientConnections.cpp" />
     <ClCompile Include="src\anet\HybridConnection.cpp" />
     <ClCompile Include="src\anet\HybridSocket.cpp" />
-    <ClCompile Include="src\anet\Packet_SFMLImpl.cpp" />
+    <ClCompile Include="src\anet\Packet_SFML.cpp" />
     <ClCompile Include="src\anet\ServerTcpConnections.cpp" />
     <ClCompile Include="src\anet\ServerUDPConnections_RakNet.cpp" />
-    <ClCompile Include="src\anet\TcpConnection_SFMLImpl.cpp" />
+    <ClCompile Include="src\anet\TcpConnection_SFML.cpp" />
     <ClCompile Include="src\anet\UdpConnection_RakNet.cpp" />
+    <ClCompile Include="src\anet\UPNPService_miniupnp.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

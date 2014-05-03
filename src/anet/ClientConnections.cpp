@@ -9,6 +9,8 @@
 #include <future>
 #include <unordered_map>
 
+#include "UPNPService.h"
+
 using namespace anet;
 
 class ClientConnections::Impl
@@ -24,6 +26,9 @@ public:
 	std::unordered_map<short, std::shared_ptr<Client>> connectedClients_;
 	boost::signals2::signal<void(std::shared_ptr<Client>)> sigClientCreated_;
 	boost::signals2::signal<void(std::shared_ptr<Client>)> sigClientRemoved_;
+
+
+	UPNPService *upnp_;
 };
 
 ClientConnections::Impl::Impl(unsigned short port, std::function<std::shared_ptr<Client>(std::shared_ptr<Client>)> onCreatedClient, ConnectionType connectionType) :
@@ -39,6 +44,11 @@ onCreatedClient_(onCreatedClient)
 	}
 
 	netThread_ = new std::thread(&ServerNetworkInterface::Run, net_);
+
+	upnp_ = new UPNPService(9000, ConnectionType::UDP);
+
+	if (upnp_->Open() == UPNPResult::UPNP_SUCCESS)
+		printf("UPNP SUCCESS\n");
 }
 
 //---

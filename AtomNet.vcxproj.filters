@@ -69,11 +69,11 @@
     <ClInclude Include="include\anet\ConnectionTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\anet\UPNPService.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\anet\Packet_SFMLImpl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\anet\ServerTcpConnections.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -98,7 +98,13 @@
     <ClCompile Include="src\anet\ServerUDPConnections_RakNet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\anet\TcpConnection_SFMLImpl.cpp">
+    <ClCompile Include="src\anet\TcpConnection_SFML.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\anet\Packet_SFML.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\anet\UPNPService_miniupnp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

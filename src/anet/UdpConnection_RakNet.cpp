@@ -12,6 +12,7 @@
 #include <functional>
 #include <iostream>
 #include "UdpMessages.h"
+
 using namespace anet;
 
 class UdpConnection::Impl
@@ -26,6 +27,7 @@ public:
 	char* ip_;
 	unsigned short port_;
 	std::function<void(bool)> callback_;
+
 };
 
 UdpConnection::Impl::Impl() :
@@ -124,7 +126,5 @@ void UdpConnection::SendPacket(std::shared_ptr<Packet> packet)
 	bs.Write(messageId);
 	bs.Write(data, length);
 
-	int result = pImpl->peer_->Send(&bs, IMMEDIATE_PRIORITY, UNRELIABLE, 0, addr, false);
-
-	std::cout << result << std::endl;
+	pImpl->peer_->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, addr, false);
 }
