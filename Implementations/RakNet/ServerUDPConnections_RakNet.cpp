@@ -1,4 +1,4 @@
-#include <anet/impl/ServerUdpConnections.h>
+#include <anet/impl/ServerUdp.h>
 #include <anet/PacketInfo.h>
 
 #include <iostream>
@@ -18,7 +18,7 @@
 
 using namespace anet;
 
-class ServerUDPConnections::Impl
+class ServerUdp::Impl
 {
 public:
 	Impl(unsigned short port);
@@ -53,7 +53,7 @@ public:
 	short RemoveSocketConnection(RakNet::SystemAddress socket);
 };
 
-ServerUDPConnections::Impl::Impl(unsigned short port) :
+ServerUdp::Impl::Impl(unsigned short port) :
 	peer_(RakNet::RakPeerInterface::GetInstance())
 {
 
@@ -72,7 +72,7 @@ ServerUDPConnections::Impl::Impl(unsigned short port) :
 }
 
 
-void ServerUDPConnections::Impl::Update()
+void ServerUdp::Impl::Update()
 {
 	//Send
 
@@ -156,7 +156,7 @@ void ServerUDPConnections::Impl::Update()
 	}
 }
 
-RakNet::SystemAddress* ServerUDPConnections::Impl::GetSocket(short id)
+RakNet::SystemAddress* ServerUdp::Impl::GetSocket(short id)
 {
 	std::map<short, RakNet::SystemAddress>::iterator it = connections_.find(id);
 
@@ -166,7 +166,7 @@ RakNet::SystemAddress* ServerUDPConnections::Impl::GetSocket(short id)
 	return NULL;
 }
 
-short ServerUDPConnections::Impl::GetId(RakNet::SystemAddress socket)
+short ServerUdp::Impl::GetId(RakNet::SystemAddress socket)
 {
 	std::map<short, RakNet::SystemAddress>::iterator it = connections_.begin();
 	for(; it != connections_.end(); it++)
@@ -178,7 +178,7 @@ short ServerUDPConnections::Impl::GetId(RakNet::SystemAddress socket)
 	return -1;
 }
 
-short ServerUDPConnections::Impl::AddSocketConnection(RakNet::SystemAddress socket)
+short ServerUdp::Impl::AddSocketConnection(RakNet::SystemAddress socket)
 {
 	short id = 0;
 
@@ -206,7 +206,7 @@ short ServerUDPConnections::Impl::AddSocketConnection(RakNet::SystemAddress sock
 	return id;
 }
 
-short ServerUDPConnections::Impl::RemoveSocketConnection(RakNet::SystemAddress socket)
+short ServerUdp::Impl::RemoveSocketConnection(RakNet::SystemAddress socket)
 {
 	std::map<short, RakNet::SystemAddress>::iterator it = connections_.begin();
 	for(; it != connections_.end(); it++)
@@ -224,31 +224,31 @@ short ServerUDPConnections::Impl::RemoveSocketConnection(RakNet::SystemAddress s
 
 //---
 
-ServerUDPConnections::ServerUDPConnections(unsigned short port)
-	: ServerNetworkInterface(port), pImpl(new ServerUDPConnections::Impl(port))
+ServerUdp::ServerUdp(unsigned short port)
+	: IServerNetwork(port), pImpl(new ServerUdp::Impl(port))
 {
 	
 }
 
-ServerUDPConnections::~ServerUDPConnections()
+ServerUdp::~ServerUdp()
 {
 	delete pImpl;
 }
 
-void ServerUDPConnections::Update()
+void ServerUdp::Update()
 {
 	pImpl->Update();
 }
 
 
-void ServerUDPConnections::SendPacket(PacketInfo* pinfo)
+void ServerUdp::SendPacket(PacketInfo* pinfo)
 {
 	pImpl->outmutex.lock();
 	pImpl->outgoing[pImpl->outflag].push_back(pinfo);
 	pImpl->outmutex.unlock();
 }
 
-std::vector<PacketInfo*>* ServerUDPConnections::GetPackets()
+std::vector<PacketInfo*>* ServerUdp::GetPackets()
 {
 	pImpl->inmutex.lock();
 
@@ -259,13 +259,13 @@ std::vector<PacketInfo*>* ServerUDPConnections::GetPackets()
 	return packets;
 }
 
-bool ServerUDPConnections::DisconnectedSockets()
+bool ServerUdp::DisconnectedSockets()
 {
 	std::lock_guard<std::mutex> lock(pImpl->dcmutex);
 	return pImpl->hasDisconnectedSockets;
 }
 
-std::vector<short> ServerUDPConnections::GetDisconnectedSockets()
+std::vector<short> ServerUdp::GetDisconnectedSockets()
 {
 	std::lock_guard<std::mutex> lock(pImpl->dcmutex);
 	pImpl->hasDisconnectedSockets = false;
@@ -274,13 +274,13 @@ std::vector<short> ServerUDPConnections::GetDisconnectedSockets()
 	return vec;
 }
 
-bool ServerUDPConnections::NewOpenSockets()
+bool ServerUdp::NewOpenSockets()
 {
 	std::lock_guard<std::mutex> lock(pImpl->newConMutex);
 	return pImpl->hasNewOpenSockets;
 }
 
-std::vector<short> ServerUDPConnections::GetNewOpenSockets()
+std::vector<short> ServerUdp::GetNewOpenSockets()
 {
 	std::lock_guard<std::mutex> lock(pImpl->newConMutex);
 	pImpl->hasNewOpenSockets = false;

@@ -1,16 +1,18 @@
 #pragma once
-#include "Packet.h"
+#include <anet/Packet.h>
+#include <anet/ConnectionTypes.h>
+#include <anet/impl/IClientNetwork.h>
+
 #include <memory>
 #include <functional>
-#include <anet/ConnectionTypes.h>
-#include <anet/impl/ClientNetworkInterface.h>
+
 namespace anet
 {
 	class Process;
 	class ClientConnection
 	{
 	public:
-		ClientConnection(std::shared_ptr<ClientNetworkInterface> implementation);
+		ClientConnection(std::shared_ptr<IClientNetwork> implementation);
 
 		void SetHost(char* ip, unsigned short port);
 
@@ -32,6 +34,6 @@ namespace anet
 
 	private:
 		class Impl;
-		Impl* pImpl;
+		std::unique_ptr<Impl> pImpl;
 	};
 }

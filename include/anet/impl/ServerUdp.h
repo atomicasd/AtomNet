@@ -1,15 +1,16 @@
 #pragma once
 
-#include <vector>
-#include "anet/impl/ServerNetworkInterface.h"
+#include "anet/impl/IServerNetwork.h"
+#include <memory>
+
 namespace anet
 {
 	class PacketInfo;
-	class ServerUDPConnections : public ServerNetworkInterface
+	class ServerUdp : public IServerNetwork
 	{
 	public:
-		ServerUDPConnections(unsigned short port);
-		virtual ~ServerUDPConnections();
+		ServerUdp(unsigned short port);
+		virtual ~ServerUdp();
 
 		void Update();
 
@@ -24,6 +25,6 @@ namespace anet
 
 	private:
 		class Impl;
-		Impl* pImpl;
+		std::unique_ptr<Impl> pImpl;
 	};
 };

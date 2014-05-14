@@ -27,7 +27,6 @@ public:
 	char* ip_;
 	unsigned short port_;
 	std::function<void(bool)> callback_;
-
 };
 
 UdpConnection::Impl::Impl() :
@@ -37,7 +36,7 @@ UdpConnection::Impl::Impl() :
 }
 
 UdpConnection::UdpConnection(std::function<void(bool)> clientConnectionCallbackResult) :
-pImpl(new Impl()), ClientNetworkInterface()
+pImpl(new Impl()), IClientNetwork()
 {
 	pImpl->callback_ = clientConnectionCallbackResult;
 }
@@ -45,7 +44,6 @@ pImpl(new Impl()), ClientNetworkInterface()
 UdpConnection::~UdpConnection()
 {
 	RakNet::RakPeerInterface::DestroyInstance(pImpl->peer_);
-	delete pImpl;
 }
 
 void UdpConnection::SetHost(char* ip, unsigned short port)
@@ -57,7 +55,6 @@ void UdpConnection::SetHost(char* ip, unsigned short port)
 void UdpConnection::Connect()
 {
 	pImpl->peer_->Connect(pImpl->ip_, pImpl->port_, 0,0);
-	std::cout << "Connecting to " << pImpl->ip_ << ":" << pImpl->port_ << std::endl;
 }
 
 void UdpConnection::Disconnect()
@@ -79,7 +76,6 @@ void UdpConnection::ReceivePackets()
 	{
 		switch (packet->data[0])
 		{
-
 			case ID_DISCONNECTION_NOTIFICATION:
 				std::cout << "ID_DISCONNECTION_NOTIFICATION" << std::endl;
 				break;
@@ -103,11 +99,7 @@ void UdpConnection::ReceivePackets()
 
 			case ID_GAME_MESSAGE_1:
 			{
-				std::shared_ptr<Packet> anetpacket(new Packet(packet->data, packet->length));
-
-				anet::Int16 type;
-				*anetpacket >> type;
-
+				std::shared_ptr<Packet> anetpacket(new Packet(&packet->data[sizeof(anet::Int32)], packet->length - sizeof(anet::Int32)));
 				packets.push_back(anetpacket);
 				break;
 			}

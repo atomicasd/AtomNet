@@ -1,4 +1,4 @@
-#include "TcpConnection.h"
+#include "ClientTcp.h"
 #include <memory>
 
 #include <SFML/Network/TcpSocket.hpp>
@@ -7,7 +7,7 @@
 
 using namespace anet;
 
-class TcpConnection::Impl
+class ClientTcp::Impl
 {
 public:
 	Impl();
@@ -17,31 +17,31 @@ public:
 	std::function<void(bool)> callback_;
 };
 
-TcpConnection::Impl::Impl()
+ClientTcp::Impl::Impl()
 	: ip_(sf::IpAddress::None),
 	port_(0)
 {
 
 }
 
-TcpConnection::TcpConnection(std::function<void(bool)> clientConnectionCallbackResult) :
-pImpl(new Impl()), ClientNetworkInterface()
+ClientTcp::ClientTcp(std::function<void(bool)> clientConnectionCallbackResult) :
+pImpl(new Impl()), IClientNetwork()
 {
 	pImpl->callback_ = clientConnectionCallbackResult;
 	pImpl->socket_.setBlocking(false);
 }
 
-TcpConnection::~TcpConnection()
+ClientTcp::~ClientTcp()
 {
 	delete pImpl;
 }
 
-void TcpConnection::SendPacket(std::shared_ptr<Packet> packet)
+void ClientTcp::SendPacket(std::shared_ptr<Packet> packet)
 {
 	pImpl->socket_.send(packet->GetData(), packet->GetDataSize());
 }
 
-void TcpConnection::ReceivePackets()
+void ClientTcp::ReceivePackets()
 {
 	sf::Packet packet;
 
@@ -51,25 +51,25 @@ void TcpConnection::ReceivePackets()
 	}
 }
 
-void TcpConnection::SetHost(char* ip, unsigned short port)
+void ClientTcp::SetHost(char* ip, unsigned short port)
 {
 	pImpl->ip_ = ip;
 	pImpl->port_ = port;
 }
 
-void TcpConnection::Connect()
+void ClientTcp::Connect()
 {
 	bool result = pImpl->socket_.connect(pImpl->ip_, pImpl->port_);
 
 	pImpl->callback_(result);
 }
 
-void TcpConnection::Disconnect()
+void ClientTcp::Disconnect()
 {
 	pImpl->socket_.disconnect();
 }
 
-bool TcpConnection::IsConnected()
+bool ClientTcp::IsConnected()
 {
 	return pImpl->socket_.getRemoteAddress() != sf::IpAddress::None;
 }

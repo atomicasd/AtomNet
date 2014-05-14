@@ -24,8 +24,6 @@
 ////////////////////////////////////////////////////////////
 //
 //	NOTICE: This file is an edited version of Packet.hpp created by Laurent Gomila
-//	The purpose of this file is to provide a pimpl interface that functions similar
-//	to the original sf::Packet class
 //
 ////////////////////////////////////////////////////////////
 
@@ -33,6 +31,7 @@
 
 #include <string>
 #include <vector>
+
 namespace anet
 {
 	// 8 bits integer types

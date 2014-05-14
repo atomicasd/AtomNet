@@ -1,4 +1,4 @@
-#include "anet/impl/ServerTCPConnections.h"
+#include "anet/impl/ServerTcp.h"
 #include "anet/PacketInfo.h"
 
 #include <SFML/Network.hpp>
@@ -11,7 +11,7 @@
 
 using namespace anet;
 
-class ServerTCPConnections::Impl
+class ServerTcp::Impl
 {
 public:
 	Impl(unsigned short port);
@@ -54,7 +54,7 @@ public:
 	void RemoveSocketConnection(sf::TcpSocket* socket);
 };
 
-ServerTCPConnections::Impl::Impl(unsigned short port)
+ServerTcp::Impl::Impl(unsigned short port)
 {
 
 	inflag = false;
@@ -68,7 +68,7 @@ ServerTCPConnections::Impl::Impl(unsigned short port)
 	printf("Started listening on port %hu\n", port);
 }
 
-void ServerTCPConnections::Impl::Update()
+void ServerTcp::Impl::Update()
 {
 	//Send
 	outmutex.lock();
@@ -148,7 +148,7 @@ void ServerTCPConnections::Impl::Update()
 	}
 }
 
-sf::TcpSocket* ServerTCPConnections::Impl::GetSocket(short id)
+sf::TcpSocket* ServerTcp::Impl::GetSocket(short id)
 {
 	std::map<short, sf::TcpSocket*>::iterator it = connections_.find(id);
 
@@ -158,7 +158,7 @@ sf::TcpSocket* ServerTCPConnections::Impl::GetSocket(short id)
 	return NULL;
 }
 
-short ServerTCPConnections::Impl::GetId(sf::TcpSocket* socket)
+short ServerTcp::Impl::GetId(sf::TcpSocket* socket)
 {
 	std::map<short, sf::TcpSocket*>::iterator it = connections_.begin();
 	for(; it != connections_.end(); it++)
@@ -170,7 +170,7 @@ short ServerTCPConnections::Impl::GetId(sf::TcpSocket* socket)
 	return -1;
 }
 
-short ServerTCPConnections::Impl::AddSocketConnection(sf::TcpSocket* socket)
+short ServerTcp::Impl::AddSocketConnection(sf::TcpSocket* socket)
 {
 	short id = 0;
 	while(true)
@@ -186,7 +186,7 @@ short ServerTCPConnections::Impl::AddSocketConnection(sf::TcpSocket* socket)
 	return id;
 }
 
-void ServerTCPConnections::Impl::RemoveSocketConnection(sf::TcpSocket* socket)
+void ServerTcp::Impl::RemoveSocketConnection(sf::TcpSocket* socket)
 {
 	std::map<short, sf::TcpSocket*>::iterator it = connections_.begin();
 	for(; it != connections_.end(); it++)
@@ -201,36 +201,36 @@ void ServerTCPConnections::Impl::RemoveSocketConnection(sf::TcpSocket* socket)
 
 //---
 
-ServerTCPConnections::ServerTCPConnections(unsigned short port)
-	: ServerNetworkInterface(port), 
-	pImpl(new ServerTCPConnections::Impl(port))
+ServerTcp::ServerTcp(unsigned short port)
+	: IServerNetwork(port), 
+	pImpl(new ServerTcp::Impl(port))
 {
 	
 }
 
-ServerTCPConnections::~ServerTCPConnections()
+ServerTcp::~ServerTcp()
 {
 
 }
 
-void ServerTCPConnections::Run()
+void ServerTcp::Run()
 {
 	pImpl->Run();
 }
 
-void ServerTCPConnections::Stop()
+void ServerTcp::Stop()
 {
 	pImpl->running = false;
 }
 
-void ServerTCPConnections::SendPacket(PacketInfo* pinfo)
+void ServerTcp::SendPacket(PacketInfo* pinfo)
 {
 	pImpl->outmutex.lock();
 	pImpl->outgoing[pImpl->outflag].push_back(pinfo);
 	pImpl->outmutex.unlock();
 }
 
-std::vector<PacketInfo*>* ServerTCPConnections::GetPackets()
+std::vector<PacketInfo*>* ServerTcp::GetPackets()
 {
 	pImpl->inmutex.lock();
 
@@ -241,13 +241,13 @@ std::vector<PacketInfo*>* ServerTCPConnections::GetPackets()
 	return packets;
 }
 
-bool ServerTCPConnections::DisconnectedSockets()
+bool ServerTcp::DisconnectedSockets()
 {
 	std::lock_guard<std::mutex>(pImpl->dcmutex);
 	return pImpl->hasDisconnectedSockets;
 }
 
-std::vector<short> ServerTCPConnections::GetDisconnectedSockets()
+std::vector<short> ServerTcp::GetDisconnectedSockets()
 {
 	std::lock_guard<std::mutex>(pImpl->dcmutex);
 
@@ -258,12 +258,12 @@ std::vector<short> ServerTCPConnections::GetDisconnectedSockets()
 	return vec;
 }
 
-bool ServerTCPConnections::NewOpenSockets()
+bool ServerTcp::NewOpenSockets()
 {
 	return pImpl->hasNewOpenSockets;
 }
 
-std::vector<short> ServerTCPConnections::GetNewOpenSockets()
+std::vector<short> ServerTcp::GetNewOpenSockets()
 {
 	std::lock_guard<std::mutex>(pImpl->newConMutex);
 

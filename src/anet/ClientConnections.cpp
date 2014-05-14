@@ -15,7 +15,7 @@ class ClientConnections::Impl
 {
 public:
 	Impl();
-public:
+
 	FuncClientSetup onCreatedClient_;
 
 	std::shared_ptr<ServerNetworkInterface> net_;

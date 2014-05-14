@@ -1,16 +1,15 @@
 #pragma once
 
-#include "anet/impl/ServerNetworkInterface.h"
-#include <vector>
+#include "anet/impl/IServerNetwork.h"
 #include <memory>
 namespace anet
 {
 	class PacketInfo;
-	class ServerTCPConnections  : public ServerNetworkInterface
+	class ServerTcp  : public IServerNetwork
 	{
 	public:
-		ServerTCPConnections(unsigned short port);
-		virtual ~ServerTCPConnections();
+		ServerTcp(unsigned short port);
+		virtual ~ServerTcp();
 
 		void Update();
 

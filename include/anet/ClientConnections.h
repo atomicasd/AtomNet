@@ -3,7 +3,7 @@
 #include <memory>
 #include <anet/Client.h>
 #include <anet/ConnectionTypes.h>
-#include <anet/impl/ServerNetworkInterface.h>
+#include <anet/impl/IServerNetwork.h>
 
 namespace anet
 {
@@ -15,7 +15,7 @@ namespace anet
 	{
 	public:
 
-		ClientConnections(FuncClientSetup onCreatedClient, std::shared_ptr<ServerNetworkInterface> implementation);
+		ClientConnections(FuncClientSetup onCreatedClient, std::shared_ptr<IServerNetwork> implementation);
 
 		virtual ~ClientConnections();
 
