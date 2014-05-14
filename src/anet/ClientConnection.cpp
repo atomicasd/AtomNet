@@ -1,7 +1,5 @@
 #include "anet/ClientConnection.h"
-#include "TcpConnection.h"
-#include "UdpConnection.h"
-#include "ClientNetworkInterface.h"
+#include "anet/impl/ClientNetworkInterface.h"
 #include <anet/ConnectionTypes.h>
 #include <memory>
 #include <assert.h>
@@ -9,56 +7,42 @@
 #include <map>
 using namespace anet;
 
-//TODO: Create a base class for connections, remove switch cases.
-
 class ClientConnection::Impl
 {
 public:
-	Impl(ConnectionType type);
-	std::unique_ptr<ClientNetworkInterface> net_;
+	Impl();
+
+	std::shared_ptr<ClientNetworkInterface> net_;
 
 	char* ip_;
 	unsigned short port_;
-
 	ConnectionType type_;
 
 	boost::signals2::signal<void(bool)> sigClientConnected_;
 	boost::signals2::signal<void(bool)> sigClientDisconnected_;
-
 	std::vector<boost::signals2::connection> sigConnections_;
 
-	void CallbackClientConnectionResult(bool result);
+	void ConnectionResultCallback(bool result);
 
-
+	std::map<int, std::shared_ptr<Process>> processes_;
 };
 
-ClientConnection::Impl::Impl(ConnectionType type)
+ClientConnection::Impl::Impl()
 	: ip_(NULL),
-	port_(0),
-	type_(type)
+	port_(0)
 {
 
-	switch(type)
-	{
-	case ConnectionType::TCP:
-		net_.reset(new TcpConnection(std::bind1st(std::mem_fun(&ClientConnection::Impl::CallbackClientConnectionResult), this)));
-	case ConnectionType::UDP:
-		net_.reset(new UdpConnection(std::bind1st(std::mem_fun(&ClientConnection::Impl::CallbackClientConnectionResult), this)));
-
-	default:
-		break;
-	}
 }
 
-void ClientConnection::Impl::CallbackClientConnectionResult(bool connected)
+void ClientConnection::Impl::ConnectionResultCallback(bool connected)
 {
 	sigClientConnected_(connected);
 }
 
-ClientConnection::ClientConnection(ConnectionType type)
-	: pImpl(new Impl(type))
+ClientConnection::ClientConnection(std::shared_ptr<ClientNetworkInterface> implementation)
+	: pImpl(new Impl())
 {
-
+	pImpl->net_ = implementation;
 }
 
 void ClientConnection::SetHost(char* ip, unsigned short port)
@@ -66,32 +50,42 @@ void ClientConnection::SetHost(char* ip, unsigned short port)
 	pImpl->ip_ = ip;
 	pImpl->port_ = port;
 
-	assert(pImpl->net_.get());
 	pImpl->net_->SetHost(ip, port);
 }
 
 void ClientConnection::Connect()
 {
-	assert(pImpl->net_.get());
 	pImpl->net_->Connect();
+}
 
+void ClientConnection::Disconnect()
+{
+	pImpl->net_->Disconnect();
+}
+
+void ClientConnection::AddProcess(int type, std::shared_ptr<Process> process)
+{
+	pImpl->processes_[type] = process;
+}
+
+void ClientConnection::RemoveProcess(int type)
+{
+	std::map<int, std::shared_ptr<Process>>::iterator it = pImpl->processes_.find(type);
+
+	if (it != pImpl->processes_.end())
+	{
+		pImpl->processes_.erase(it);
+	}
 }
 
 void ClientConnection::SendPacket(std::shared_ptr<Packet> packet)
 {
-	assert(pImpl->net_.get());
 	return pImpl->net_->SendPacket(packet);
 }
 
 void ClientConnection::ReceivePackets()
 {
-	assert(pImpl->net_.get());
 	pImpl->net_->ReceivePackets();
-}
-void ClientConnection::Disconnect()
-{
-	assert(pImpl->net_.get());
-	pImpl->net_->Disconnect();
 }
 
 void ClientConnection::RegisterConnectionCallback(std::function<void(bool)> onConnected)

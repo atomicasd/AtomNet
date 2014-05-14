@@ -33,50 +33,35 @@
     <ClInclude Include="include\anet\Process.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\anet\ServerTcpConnections.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\anet\TcpConnection.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\anet\ClientConnection.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\anet\UdpConnection.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\anet\UdpMessages.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\anet\ServerUdpConnections.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\anet\ServerNetworkInterface.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\anet\HybridConnection.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\anet\HybridSocket.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\anet\IpPort.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\anet\ClientNetworkInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\anet\ConnectionTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\anet\UPNPService.h">
+    <ClInclude Include="include\anet\impl\UdpConnection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\anet\impl\ServerUdpConnections.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\anet\impl\ClientNetworkInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\anet\impl\ServerNetworkInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\anet\UPnP.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\anet\impl\TcpConnection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\anet\impl\ServerTcpConnections.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\anet\ServerTcpConnections.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\anet\ClientConnections.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -86,25 +71,7 @@
     <ClCompile Include="src\anet\ClientConnection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\anet\HybridConnection.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\anet\HybridSocket.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\anet\UdpConnection_RakNet.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\anet\ServerUDPConnections_RakNet.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\anet\TcpConnection_SFML.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\anet\Packet_SFML.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\anet\UPNPService_miniupnp.cpp">
+    <ClCompile Include="src\anet\Packet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

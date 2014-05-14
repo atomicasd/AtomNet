@@ -8,12 +8,14 @@ namespace anet
 	class Process
 	{
 	public:
-		Process(int type) : m_type(type) {};
+		Process(int type) : type_(type) {};
+
 		virtual ~Process() {};
 
 		virtual void Start() = 0;
+
 		virtual void HandlePacket(Packet& packet) = 0;
 	private:
-		int m_type;
+		int type_;
 	};
 }; 

@@ -1,5 +1,11 @@
-#include "ServerUDPConnections.h"
-#include "anet/PacketInfo.h"
+#include <anet/impl/ServerUdpConnections.h>
+#include <anet/PacketInfo.h>
+
+#include <iostream>
+#include <map>
+#include <mutex>
+#include <memory>
+#include <atomic>
 
 #include "RakPeer.h"
 #include "RakPeerInterface.h"
@@ -7,14 +13,6 @@
 #include "MessageIdentifiers.h"
 #include "BitStream.h"
 #include "UdpMessages.h"
-
-
-
-#include <Windows.h>
-#include <iostream>
-#include <map>
-#include <mutex>
-#include <memory>
 
 #define FPS 1.0f/60.0f
 
@@ -24,10 +22,9 @@ class ServerUDPConnections::Impl
 {
 public:
 	Impl(unsigned short port);
-	void Run();
+	void Update();
 
 public:
-	bool running;
 	RakNet::RakPeerInterface *peer_;
 
 	bool hasNewOpenSockets;
@@ -59,7 +56,6 @@ public:
 ServerUDPConnections::Impl::Impl(unsigned short port) :
 	peer_(RakNet::RakPeerInterface::GetInstance())
 {
-	running = true;
 
 	inflag = false;
 	outflag = false;
@@ -76,83 +72,87 @@ ServerUDPConnections::Impl::Impl(unsigned short port) :
 }
 
 
-void ServerUDPConnections::Impl::Run()
+void ServerUDPConnections::Impl::Update()
 {
-	while(running)
+	//Send
+
+	outmutex.lock();
+	std::vector<PacketInfo*>* packets = &outgoing[outflag];
+	outflag = !outflag;
+	outmutex.unlock();
+
+	for(std::vector<PacketInfo*>::iterator it = packets->begin(); it != packets->end(); it++, delete (*it))
 	{
-		Sleep(20);
-		//Send
-		outmutex.lock();
-		std::vector<PacketInfo*>* packets = &outgoing[outflag];
-		outflag = !outflag;
-		outmutex.unlock();
-		for(std::vector<PacketInfo*>::iterator it = packets->begin(); it != packets->end(); it++)
+		PacketInfo* p = (*it);
+		RakNet::SystemAddress* addr = GetSocket(p->id);
+		if(addr)
 		{
-			PacketInfo* p = (*it);
-			RakNet::SystemAddress* addr = GetSocket(p->id);
-			if(addr)
-			{
-				printf("Sending packet");
-				const char* data = (const char*)p->packet.GetData();
-				const int length = (const int)p->packet.GetDataSize();
-				peer_->Send(data, length, HIGH_PRIORITY, RELIABLE_ORDERED, 0, *addr, false);
-			}
-
-			delete p;
+			const char* data = (const char*)p->packet.GetData();
+			const int length = (const int)p->packet.GetDataSize();
+			peer_->Send(data, length, HIGH_PRIORITY, RELIABLE_ORDERED, 0, *addr, false);
 		}
+	}
 
+	if (packets->size() > 0)
+	{
 		packets->clear();
+	}
 
-		//Receive
+	//Receive
 
-		RakNet::Packet *packet;
-		for (packet=peer_->Receive(); packet; peer_->DeallocatePacket(packet), packet=peer_->Receive())
+	RakNet::Packet *packet;
+	for (packet=peer_->Receive(); packet; peer_->DeallocatePacket(packet), packet=peer_->Receive())
+	{
+		switch(packet->data[0])
 		{
-			switch(packet->data[0])
-			{
-				case ID_NEW_INCOMING_CONNECTION:
+			case ID_NEW_INCOMING_CONNECTION:
+				{
+					short id = AddSocketConnection(packet->systemAddress);
 					{
-						printf("Another client has connected.\n");
+						std::lock_guard<std::mutex> lock(newConMutex);
+						newOpenSockets.push_back(id);
+						hasNewOpenSockets = true;
+					}
+				}
 
-						short id = AddSocketConnection(packet->systemAddress);
+				break;
+
+				case ID_DISCONNECTION_NOTIFICATION:
+				case ID_CONNECTION_LOST:
+					{
+						short id = RemoveSocketConnection(packet->systemAddress);
 						{
-							std::lock_guard<std::mutex> lock(newConMutex);
-							newOpenSockets.push_back(id);
-							hasNewOpenSockets = true;
+							std::lock_guard<std::mutex> lock(dcmutex);
+							disconnectedSockets.push_back(id);
+							hasDisconnectedSockets = true;
 						}
 					}
-
 					break;
 
-					case ID_DISCONNECTION_NOTIFICATION:
-					case ID_CONNECTION_LOST:
-						{
-							printf("Dropped client.\n");
+				case ID_USER_PACKET_ENUM:
+				{
+											short id = GetId(packet->systemAddress);
+												
+											if (id < 0)
+												break;
 
-							short id = RemoveSocketConnection(packet->systemAddress);
-							{
-								std::lock_guard<std::mutex> lock(dcmutex);
-								disconnectedSockets.push_back(id);
-								hasDisconnectedSockets = true;
-							}
-						}
-						break;
+											PacketInfo* pInfo = new PacketInfo(packet->data, packet->length);
 
-					case ID_USER_PACKET_ENUM:
-					{
-						PacketInfo* pInfo = new PacketInfo(packet->data, packet->length);
-						inmutex.lock();
-						incoming[inflag].push_back(pInfo);
-						inmutex.unlock();
-					}
+											pInfo->id = GetId(packet->systemAddress);
 
-					break;
+											anet::Int32 type;
+											pInfo->packet >> type;
+
+											inmutex.lock();
+											incoming[inflag].push_back(pInfo);
+											inmutex.unlock();
+				}
+
+				break;
 					
-				default:
-					break;
-			}
+			default:
+				break;
 		}
-
 	}
 }
 
@@ -235,10 +235,11 @@ ServerUDPConnections::~ServerUDPConnections()
 	delete pImpl;
 }
 
-void ServerUDPConnections::Run()
+void ServerUDPConnections::Update()
 {
-	pImpl->Run();
+	pImpl->Update();
 }
+
 
 void ServerUDPConnections::SendPacket(PacketInfo* pinfo)
 {

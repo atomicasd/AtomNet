@@ -10,7 +10,8 @@ namespace anet
 	public:
 		ServerNetworkInterface(unsigned short port) {};
 		virtual ~ServerNetworkInterface() {};
-		virtual void Run() = 0;
+
+		virtual void Update() = 0;
 
 		virtual void SendPacket(PacketInfo* pInfo) = 0;
 		virtual std::vector<PacketInfo*>* GetPackets() = 0;
@@ -20,5 +21,6 @@ namespace anet
 
 		virtual bool NewOpenSockets() = 0;
 		virtual std::vector<short> GetNewOpenSockets() = 0;
+
 	};
 };

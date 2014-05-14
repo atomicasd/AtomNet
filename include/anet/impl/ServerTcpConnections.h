@@ -1,7 +1,8 @@
 #pragma once
 
+#include "anet/impl/ServerNetworkInterface.h"
 #include <vector>
-#include "ServerNetworkInterface.h"
+#include <memory>
 namespace anet
 {
 	class PacketInfo;
@@ -10,7 +11,8 @@ namespace anet
 	public:
 		ServerTCPConnections(unsigned short port);
 		virtual ~ServerTCPConnections();
-		void Run();
+
+		void Update();
 
 		void SendPacket(PacketInfo* pInfo);
 		std::vector<PacketInfo*>* GetPackets();
@@ -23,6 +25,6 @@ namespace anet
 
 	private:
 		class Impl;
-		Impl* pImpl;
+		std::unique_ptr<Impl> pImpl;
 	};
 };

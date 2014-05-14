@@ -3,29 +3,32 @@
 #include <memory>
 #include <anet/Client.h>
 #include <anet/ConnectionTypes.h>
-#include <anet/IpPort.h>
+#include <anet/impl/ServerNetworkInterface.h>
 
 namespace anet
 {
+	typedef std::function<std::shared_ptr<Client>(std::shared_ptr<Client>)> FuncClientSetup;
+	typedef std::function<void(std::shared_ptr<Client>)> FuncClient;
+
 	class PacketInfo;
 	class ClientConnections
 	{
 	public:
 
-		ClientConnections(unsigned short port, std::function<std::shared_ptr<Client>(std::shared_ptr<Client>)> onCreatedClient, ConnectionType connectionType = ConnectionType::TCP);
-
-		ClientConnections(std::function<std::shared_ptr<Client>(std::shared_ptr<Client>)> onCreatedClient, IpPort& rendevouzServer);
+		ClientConnections(FuncClientSetup onCreatedClient, std::shared_ptr<ServerNetworkInterface> implementation);
 
 		virtual ~ClientConnections();
 
 		void ProcessClients();
+
 		void SendPacket(PacketInfo* pInfo);
 
-		void OnClientCreated(std::function<void(std::shared_ptr<Client>)> onClientCreated);
-		void OnClientRemoved(std::function<void(std::shared_ptr<Client>)> onClientRemoved);
+		void OnClientCreated(FuncClient onClientCreated);
+
+		void OnClientRemoved(FuncClient onClientRemoved);
 
 	private:
 		class Impl;
-		Impl* pImpl;
+		std::unique_ptr<Impl> pImpl;
 	};
 };

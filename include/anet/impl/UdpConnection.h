@@ -1,13 +1,13 @@
 #pragma once
 
-#include "ClientNetworkInterface.h"
+#include <anet/impl/ClientNetworkInterface.h>
 namespace anet
 {
-	class TcpConnection : public ClientNetworkInterface
+	class UdpConnection : public ClientNetworkInterface
 	{
 	public:
-		TcpConnection(std::function<void(bool)> clientConnectionCallbackResult);
-		virtual ~TcpConnection();
+		UdpConnection(std::function<void(bool)> clientConnectionCallbackResult);
+		virtual ~UdpConnection();
 
 		void SetHost(char* ip, unsigned short port);
 		void Connect();

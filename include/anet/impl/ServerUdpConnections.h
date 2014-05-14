@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include "ServerNetworkInterface.h"
+#include "anet/impl/ServerNetworkInterface.h"
 namespace anet
 {
 	class PacketInfo;
@@ -10,7 +10,8 @@ namespace anet
 	public:
 		ServerUDPConnections(unsigned short port);
 		virtual ~ServerUDPConnections();
-		void Run();
+
+		void Update();
 
 		void SendPacket(PacketInfo* pInfo);
 		std::vector<PacketInfo*>* GetPackets();

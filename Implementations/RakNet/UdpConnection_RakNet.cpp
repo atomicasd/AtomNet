@@ -1,4 +1,4 @@
-#include "UdpConnection.h"
+#include "anet/impl/UdpConnection.h"
 
 #include "RakPeer.h"
 #include "RakPeerInterface.h"
@@ -102,8 +102,15 @@ void UdpConnection::ReceivePackets()
 				break;
 
 			case ID_GAME_MESSAGE_1:
-				packets.push_back( std::shared_ptr<Packet>(new Packet(packet->data, packet->length)));
+			{
+				std::shared_ptr<Packet> anetpacket(new Packet(packet->data, packet->length));
+
+				anet::Int16 type;
+				*anetpacket >> type;
+
+				packets.push_back(anetpacket);
 				break;
+			}
 
 			default:
 				std::cout << packet->data[0] << std::endl;

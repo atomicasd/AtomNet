@@ -21,8 +21,6 @@
 // 3. This notice may not be removed or altered from any source distribution.
 //
 
-
-
 ////////////////////////////////////////////////////////////
 //
 //	NOTICE: This file is an edited version of Packet.hpp created by Laurent Gomila
@@ -112,7 +110,11 @@ namespace anet
 		Packet& operator <<(const std::wstring& data);
 
 	private :
-		class Impl;
-		Impl* pImpl;
+
+		bool CheckSize(std::size_t size);
+
+		std::vector<char> m_data;
+		std::size_t m_readPos;
+		bool m_isValid;
 };
 }

@@ -12,15 +12,11 @@ namespace anet
 		UPNP_NOIGD
 	} UPNPResult;
 
-	class UPNPService
+	class UPnP
 	{
 	public:
-		UPNPService(unsigned short port, ConnectionType connectionType);
+		UPnP();
 
-		UPNPResult Open();
-
-	private:
-		class Impl;
-		std::shared_ptr<Impl> pImpl;
+		UPNPResult Open(unsigned short port, ConnectionType connectionType);
 	};
 };

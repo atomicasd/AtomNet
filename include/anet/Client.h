@@ -12,11 +12,14 @@ namespace anet
 		Client(short id);
 		virtual ~Client();
 
-		void AttachProcess(int processType, std::shared_ptr<Process> process);
+		void AddProcess(int type, std::shared_ptr<Process> process);
+		void Removeprocess(int type);
+
 		void HandlePacket(Packet& packet);
-		short GetId();
+
+		short GetId() const;
 	private:
 		class Impl;
-		Impl* pImpl;
+		std::unique_ptr<Impl> pImpl;
 	};
 };

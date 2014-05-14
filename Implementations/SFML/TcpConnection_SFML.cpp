@@ -21,13 +21,14 @@ TcpConnection::Impl::Impl()
 	: ip_(sf::IpAddress::None),
 	port_(0)
 {
-	socket_.setBlocking(false);
+
 }
 
 TcpConnection::TcpConnection(std::function<void(bool)> clientConnectionCallbackResult) :
 pImpl(new Impl()), ClientNetworkInterface()
 {
 	pImpl->callback_ = clientConnectionCallbackResult;
+	pImpl->socket_.setBlocking(false);
 }
 
 TcpConnection::~TcpConnection()
@@ -58,10 +59,9 @@ void TcpConnection::SetHost(char* ip, unsigned short port)
 
 void TcpConnection::Connect()
 {
-	if(pImpl->socket_.connect(pImpl->ip_, pImpl->port_))
-		pImpl->callback_(true);
-	else
-		pImpl->callback_(false);
+	bool result = pImpl->socket_.connect(pImpl->ip_, pImpl->port_);
+
+	pImpl->callback_(result);
 }
 
 void TcpConnection::Disconnect()

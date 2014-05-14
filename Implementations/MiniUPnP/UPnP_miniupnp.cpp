@@ -1,4 +1,4 @@
-#include "UPNPService.h"
+#include <anet/UPnP.h>
 
 #include "miniupnpc.h"
 #include "upnpcommands.h"
@@ -6,29 +6,15 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+
 using namespace anet;
 
-class UPNPService::Impl
-{
-public:
-	Impl();
-
-	unsigned short port_;
-	ConnectionType connectionType_;
-
-};
-
-UPNPService::Impl::Impl()
+UPnP::UPnP()
 {
 
 }
 
-UPNPService::UPNPService(unsigned short port, ConnectionType connectionType) : pImpl(new Impl())
-{
-
-}
-
-UPNPResult UPNPService::Open()
+UPNPResult UPnP::Open(unsigned short port, ConnectionType connectionType)
 {
 	struct UPNPDev * devlist = 0;
 
@@ -46,9 +32,9 @@ UPNPResult UPNPService::Open()
 		if (igd != 0)
 		{
 			char iport[32];
-			_itoa_s(pImpl->port_, iport, 10);
+			_itoa_s(port, iport, 10);
 			char eport[32];
-			_itoa_s(pImpl->port_, eport, 10);
+			_itoa_s(port, eport, 10);
 
 			int r = UPNP_AddPortMapping(urls.controlURL, 
 				data.first.servicetype,
@@ -56,7 +42,7 @@ UPNPResult UPNPService::Open()
 				iport, 
 				lanaddr, 
 				0, 
-				(pImpl->connectionType_ == ConnectionType::UDP) ? "UDP" : "TCP",
+				(connectionType == ConnectionType::UDP) ? "UDP" : "TCP",
 				0, 
 				"0");
 
@@ -74,7 +60,7 @@ UPNPResult UPNPService::Open()
 				urls.controlURL,
 				data.first.servicetype,
 				eport,
-				(pImpl->connectionType_ == ConnectionType::UDP) ? "UDP" : "TCP",
+				(connectionType == ConnectionType::UDP) ? "UDP" : "TCP",
 				lanaddr,
 				intClient,
 				intPort,
