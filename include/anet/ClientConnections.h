@@ -1,4 +1,5 @@
 #pragma once
+
 #include <functional>
 #include <memory>
 #include <anet/Client.h>
@@ -19,9 +20,9 @@ namespace anet
 
 		virtual ~ClientConnections();
 
-		void ProcessClients();
+		void Update();
 
-		void SendPacket(PacketInfo* pInfo);
+		void SendPacket(std::shared_ptr<PacketInfo> pInfo);
 
 		void OnClientCreated(FuncClient onClientCreated);
 

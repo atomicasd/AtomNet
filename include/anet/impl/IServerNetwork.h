@@ -1,21 +1,21 @@
 #pragma once
 
 #include <vector>
-
+#include <memory>
 namespace anet
 {
 	class PacketInfo;
-	class ServerNetworkInterface
+	class IServerNetwork
 	{
 	public:
-		ServerNetworkInterface(unsigned short port) {};
-		virtual ~ServerNetworkInterface() {};
+		IServerNetwork(unsigned short port) {};
+		virtual ~IServerNetwork() {};
 
 		virtual void Update() = 0;
 
-		virtual void SendPacket(PacketInfo* pInfo) = 0;
+		virtual void SendPacket(std::shared_ptr<PacketInfo> pInfo) = 0;
 
-		virtual std::vector<PacketInfo*>* GetPackets() = 0;
+		virtual std::vector<std::shared_ptr<PacketInfo>>* GetPackets() = 0;
 
 		virtual bool DisconnectedSockets() = 0;
 

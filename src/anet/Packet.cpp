@@ -21,7 +21,6 @@
 // 3. This notice may not be removed or altered from any source distribution.
 //
 
-
 ////////////////////////////////////////////////////////////
 //
 //	NOTICE: This file is an edited version of Packet.cpp created by Laurent Gomila

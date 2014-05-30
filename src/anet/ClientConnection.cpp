@@ -1,5 +1,5 @@
 #include "anet/ClientConnection.h"
-#include "anet/impl/ClientNetworkInterface.h"
+#include "anet/impl/IClientNetwork.h"
 #include <anet/ConnectionTypes.h>
 #include <memory>
 #include <assert.h>
@@ -12,7 +12,7 @@ class ClientConnection::Impl
 public:
 	Impl();
 
-	std::shared_ptr<ClientNetworkInterface> net_;
+	std::shared_ptr<IClientNetwork> net_;
 
 	char* ip_;
 	unsigned short port_;
@@ -39,10 +39,15 @@ void ClientConnection::Impl::ConnectionResultCallback(bool connected)
 	sigClientConnected_(connected);
 }
 
-ClientConnection::ClientConnection(std::shared_ptr<ClientNetworkInterface> implementation)
+ClientConnection::ClientConnection(std::shared_ptr<IClientNetwork> implementation)
 	: pImpl(new Impl())
 {
 	pImpl->net_ = implementation;
+}
+
+ClientConnection::~ClientConnection()
+{
+	pImpl->net_->Disconnect();
 }
 
 void ClientConnection::SetHost(char* ip, unsigned short port)

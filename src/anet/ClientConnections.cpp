@@ -1,7 +1,7 @@
-#include "anet/ClientConnections.h"
-#include "anet/impl/ServerNetworkInterface.h"
-#include "anet/PacketInfo.h"
-#include "anet/Client.h"
+#include <anet/ClientConnections.h>
+#include <anet/impl/IServerNetwork.h>
+#include <anet/PacketInfo.h>
+#include <anet/Client.h>
 
 #include <boost/signals2.hpp>
 
@@ -18,7 +18,7 @@ public:
 
 	FuncClientSetup onCreatedClient_;
 
-	std::shared_ptr<ServerNetworkInterface> net_;
+	std::shared_ptr<IServerNetwork> net_;
 
 	std::unordered_map<short, std::shared_ptr<Client>> connectedClients_;
 	boost::signals2::signal<void(std::shared_ptr<Client>)> sigClientCreated_;
@@ -34,7 +34,7 @@ ClientConnections::Impl::Impl()
 
 ClientConnections::ClientConnections(
 	FuncClientSetup onCreatedClient, 
-	std::shared_ptr<ServerNetworkInterface> implementation) :
+	std::shared_ptr<IServerNetwork> implementation) :
 	pImpl(new Impl())
 {
 	pImpl->onCreatedClient_ = onCreatedClient;
@@ -44,9 +44,10 @@ ClientConnections::ClientConnections(
 
 ClientConnections::~ClientConnections()
 {
+
 }
 
-void ClientConnections::ProcessClients()
+void ClientConnections::Update()
 {
 	if(pImpl->net_->NewOpenSockets())
 	{
@@ -62,7 +63,7 @@ void ClientConnections::ProcessClients()
 	{
 		for(short id : pImpl->net_->GetDisconnectedSockets())
 		{
-			std::unordered_map<short, std::shared_ptr<Client>>::iterator it = pImpl->connectedClients_.find(id);
+			auto it = pImpl->connectedClients_.find(id);
 			if (it != pImpl->connectedClients_.end())
 			{
 				pImpl->sigClientRemoved_(it->second);
@@ -71,16 +72,21 @@ void ClientConnections::ProcessClients()
 		}
 	}
 
-	std::vector<PacketInfo*>& packets = *pImpl->net_->GetPackets();
-	for(PacketInfo* pInfo : packets)
+	auto packets = pImpl->net_->GetPackets();
+
+	for (auto it = packets->begin(); it != packets->end(); it++)
 	{
-		pImpl->connectedClients_[pInfo->id]->HandlePacket(pInfo->packet);
-		delete pInfo;
+		PacketInfo* pInfo = it->get();
+		if (pImpl->connectedClients_.find(pInfo->id) != pImpl->connectedClients_.end())
+		{
+			pImpl->connectedClients_[pInfo->id]->HandlePacket(pInfo->packet);
+		}
 	}
-	packets.clear();
+
+	packets->clear();
 }
 
-void ClientConnections::SendPacket(PacketInfo* pInfo)
+void ClientConnections::SendPacket(std::shared_ptr<PacketInfo> pInfo)
 {
 	pImpl->net_->SendPacket(pInfo);
 }

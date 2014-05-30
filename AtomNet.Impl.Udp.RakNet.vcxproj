@@ -41,7 +41,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetName>AtomNet.Impl.Udp.RakNet-d</TargetName>
-    <OutDir>lib</OutDir>
+    <OutDir>lib\</OutDir>
+    <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -82,8 +83,8 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Implementations\RakNet\ServerUDPConnections_RakNet.cpp" />
-    <ClCompile Include="Implementations\RakNet\UdpConnection_RakNet.cpp" />
+    <ClCompile Include="Implementations\RakNet\ServerUdp_RakNet.cpp" />
+    <ClCompile Include="Implementations\RakNet\ClientUdp_RakNet.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Implementations\RakNet\UdpMessages.h" />

@@ -18,10 +18,10 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Implementations\RakNet\ServerUDPConnections_RakNet.cpp">
+    <ClCompile Include="Implementations\RakNet\ClientUdp_RakNet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Implementations\RakNet\UdpConnection_RakNet.cpp">
+    <ClCompile Include="Implementations\RakNet\ServerUdp_RakNet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -42,7 +42,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>.\lib\</OutDir>
     <TargetName>$(ProjectName)-s-d</TargetName>
-    <IntDir>.\lib\</IntDir>
+    <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -94,16 +94,16 @@
     <ClInclude Include="include\anet\Client.h" />
     <ClInclude Include="include\anet\ClientConnection.h" />
     <ClInclude Include="include\anet\ClientConnections.h" />
-    <ClInclude Include="include\anet\impl\ClientNetworkInterface.h" />
+    <ClInclude Include="include\anet\impl\IClientNetwork.h" />
     <ClInclude Include="include\anet\ConnectionTypes.h" />
     <ClInclude Include="include\anet\Packet.h" />
     <ClInclude Include="include\anet\PacketInfo.h" />
     <ClInclude Include="include\anet\Process.h" />
-    <ClInclude Include="include\anet\impl\ServerNetworkInterface.h" />
-    <ClInclude Include="include\anet\impl\ServerTcpConnections.h" />
-    <ClInclude Include="include\anet\impl\ServerUdpConnections.h" />
-    <ClInclude Include="include\anet\impl\TcpConnection.h" />
-    <ClInclude Include="include\anet\impl\UdpConnection.h" />
+    <ClInclude Include="include\anet\impl\IServerNetwork.h" />
+    <ClInclude Include="include\anet\impl\ServerTcp.h" />
+    <ClInclude Include="include\anet\impl\ServerUdp.h" />
+    <ClInclude Include="include\anet\impl\ClientTcp.h" />
+    <ClInclude Include="include\anet\impl\ClientUdp.h" />
     <ClInclude Include="include\anet\UPnP.h" />
   </ItemGroup>
   <ItemGroup>

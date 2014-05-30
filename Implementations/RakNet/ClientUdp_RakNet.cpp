@@ -1,4 +1,4 @@
-#include "anet/impl/UdpConnection.h"
+#include <anet/impl/ClientUdp.h>
 
 #include "RakPeer.h"
 #include "RakPeerInterface.h"
@@ -15,7 +15,7 @@
 
 using namespace anet;
 
-class UdpConnection::Impl
+class ClientUdp::Impl
 {
 public:
 	Impl();
@@ -29,45 +29,45 @@ public:
 	std::function<void(bool)> callback_;
 };
 
-UdpConnection::Impl::Impl() :
+ClientUdp::Impl::Impl() :
 	peer_(RakNet::RakPeerInterface::GetInstance())
 {
 	peer_->Startup(1,&sd_, 1);
 }
 
-UdpConnection::UdpConnection(std::function<void(bool)> clientConnectionCallbackResult) :
+ClientUdp::ClientUdp(std::function<void(bool)> clientConnectionCallbackResult) :
 pImpl(new Impl()), IClientNetwork()
 {
 	pImpl->callback_ = clientConnectionCallbackResult;
 }
 
-UdpConnection::~UdpConnection()
+ClientUdp::~ClientUdp()
 {
 	RakNet::RakPeerInterface::DestroyInstance(pImpl->peer_);
 }
 
-void UdpConnection::SetHost(char* ip, unsigned short port)
+void ClientUdp::SetHost(char* ip, unsigned short port)
 {
 	pImpl->ip_ = ip;
 	pImpl->port_ = port;
 }
 
-void UdpConnection::Connect()
+void ClientUdp::Connect()
 {
 	pImpl->peer_->Connect(pImpl->ip_, pImpl->port_, 0,0);
 }
 
-void UdpConnection::Disconnect()
+void ClientUdp::Disconnect()
 {
-	pImpl->peer_->Shutdown(0);
+	pImpl->peer_->Shutdown(500);
 }
 
-bool UdpConnection::IsConnected()
+bool ClientUdp::IsConnected()
 {
 	return pImpl->peer_->IsActive();
 }
 
-void UdpConnection::ReceivePackets()
+void ClientUdp::ReceivePackets()
 {
 	RakNet::Packet *packet;
 	RakNet::RakPeerInterface* peer = pImpl->peer_;
@@ -99,7 +99,10 @@ void UdpConnection::ReceivePackets()
 
 			case ID_GAME_MESSAGE_1:
 			{
-				std::shared_ptr<Packet> anetpacket(new Packet(&packet->data[sizeof(anet::Int32)], packet->length - sizeof(anet::Int32)));
+				unsigned char* data = packet->data + sizeof(int);
+				unsigned int length = packet->length - sizeof(int);
+
+				std::shared_ptr<Packet> anetpacket(new Packet(data, length));
 				packets.push_back(anetpacket);
 				break;
 			}
@@ -111,7 +114,7 @@ void UdpConnection::ReceivePackets()
 	}
 }
 
-void UdpConnection::SendPacket(std::shared_ptr<Packet> packet)
+void ClientUdp::SendPacket(std::shared_ptr<Packet> packet)
 {
 	RakNet::SystemAddress addr;
 	addr.FromString(pImpl->ip_);

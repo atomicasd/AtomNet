@@ -54,7 +54,7 @@ void Client::Removeprocess(int type)
 
 void Client::HandlePacket(Packet& packet)
 {
-	anet::Int16 type;
+	int type;
 	packet >> type;
 
 	std::map<int, std::shared_ptr<Process>>::iterator it = pImpl->processes_.find(type);

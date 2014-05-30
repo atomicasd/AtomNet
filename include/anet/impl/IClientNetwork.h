@@ -3,6 +3,7 @@
 #include <vector>
 #include <memory>
 #include <anet/Packet.h>
+
 namespace anet
 {
 	class IClientNetwork

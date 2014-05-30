@@ -2,6 +2,7 @@
 
 #include <anet/impl/IClientNetwork.h>
 #include <functional>
+
 namespace anet
 {
 	class ClientUdp : public IClientNetwork
@@ -11,11 +12,15 @@ namespace anet
 		virtual ~ClientUdp();
 
 		void SetHost(char* ip, unsigned short port);
+
 		void Connect();
+
 		void Disconnect();
+
 		bool IsConnected();
 
 		void SendPacket(std::shared_ptr<Packet> packet);
+
 		void ReceivePackets();
 
 	private:

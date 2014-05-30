@@ -39,25 +39,25 @@
     <ClInclude Include="include\anet\ConnectionTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\anet\impl\UdpConnection.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\anet\impl\ServerUdpConnections.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\anet\impl\ClientNetworkInterface.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\anet\impl\ServerNetworkInterface.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\anet\UPnP.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\anet\impl\TcpConnection.h">
+    <ClInclude Include="include\anet\impl\IClientNetwork.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\anet\impl\ServerTcpConnections.h">
+    <ClInclude Include="include\anet\impl\IServerNetwork.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\anet\impl\ServerTcp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\anet\impl\ServerUdp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\anet\impl\ClientTcp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\anet\impl\ClientUdp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

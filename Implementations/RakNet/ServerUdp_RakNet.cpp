@@ -37,11 +37,11 @@ public:
 
 public:
 	std::mutex inmutex;
-	std::vector<PacketInfo*> incoming[2];
+	std::vector<std::shared_ptr<PacketInfo>> incoming[2];
 	bool inflag;
 
 	std::mutex outmutex;
-	std::vector<PacketInfo*> outgoing[2];
+	std::vector<std::shared_ptr<PacketInfo>> outgoing[2];
 	bool outflag;
 
 public:
@@ -77,13 +77,14 @@ void ServerUdp::Impl::Update()
 	//Send
 
 	outmutex.lock();
-	std::vector<PacketInfo*>* packets = &outgoing[outflag];
+	std::vector<std::shared_ptr<PacketInfo>>* packets = &outgoing[outflag];
 	outflag = !outflag;
 	outmutex.unlock();
 
-	for(std::vector<PacketInfo*>::iterator it = packets->begin(); it != packets->end(); it++, delete (*it))
+	for(auto it = packets->begin(); it != packets->end(); it++)
 	{
-		PacketInfo* p = (*it);
+		PacketInfo* p = it->get();
+
 		RakNet::SystemAddress* addr = GetSocket(p->id);
 		if(addr)
 		{
@@ -131,21 +132,21 @@ void ServerUdp::Impl::Update()
 
 				case ID_USER_PACKET_ENUM:
 				{
-											short id = GetId(packet->systemAddress);
+					short id = GetId(packet->systemAddress);
 												
-											if (id < 0)
-												break;
+					if (id < 0)
+						break;
 
-											PacketInfo* pInfo = new PacketInfo(packet->data, packet->length);
+					unsigned char* data = packet->data + sizeof(anet::Int8);
+					unsigned int length = packet->length - sizeof(anet::Int8);
 
-											pInfo->id = GetId(packet->systemAddress);
+					std::shared_ptr<PacketInfo> pInfo(new PacketInfo(data, length));
 
-											anet::Int32 type;
-											pInfo->packet >> type;
+					pInfo->id = id;
 
-											inmutex.lock();
-											incoming[inflag].push_back(pInfo);
-											inmutex.unlock();
+					inmutex.lock();
+					incoming[inflag].push_back(pInfo);
+					inmutex.unlock();
 				}
 
 				break;
@@ -168,8 +169,7 @@ RakNet::SystemAddress* ServerUdp::Impl::GetSocket(short id)
 
 short ServerUdp::Impl::GetId(RakNet::SystemAddress socket)
 {
-	std::map<short, RakNet::SystemAddress>::iterator it = connections_.begin();
-	for(; it != connections_.end(); it++)
+	for (auto it = connections_.begin(); it != connections_.end(); it++)
 	{
 		if(it->second.systemIndex == socket.systemIndex)
 			return it->first;
@@ -182,14 +182,7 @@ short ServerUdp::Impl::AddSocketConnection(RakNet::SystemAddress socket)
 {
 	short id = 0;
 
-	if(connections_.size() == 0)
-	{
-		connections_[0] = socket;
-		return id;
-	}
-
-	std::map<short, RakNet::SystemAddress>::iterator it = connections_.begin();
-	for(; it != connections_.end(); it++)
+	for(auto it = connections_.begin(); it != connections_.end(); it++)
 	{
 		if(it->first == id)
 		{
@@ -208,8 +201,7 @@ short ServerUdp::Impl::AddSocketConnection(RakNet::SystemAddress socket)
 
 short ServerUdp::Impl::RemoveSocketConnection(RakNet::SystemAddress socket)
 {
-	std::map<short, RakNet::SystemAddress>::iterator it = connections_.begin();
-	for(; it != connections_.end(); it++)
+	for (auto it = connections_.begin(); it != connections_.end(); it++)
 	{
 		if(strcmp(it->second.ToString(), it->second.ToString()) == 0 && it->second.GetPort() == socket.GetPort())
 		{
@@ -232,7 +224,7 @@ ServerUdp::ServerUdp(unsigned short port)
 
 ServerUdp::~ServerUdp()
 {
-	delete pImpl;
+
 }
 
 void ServerUdp::Update()
@@ -241,18 +233,18 @@ void ServerUdp::Update()
 }
 
 
-void ServerUdp::SendPacket(PacketInfo* pinfo)
+void ServerUdp::SendPacket(std::shared_ptr<PacketInfo> pinfo)
 {
 	pImpl->outmutex.lock();
 	pImpl->outgoing[pImpl->outflag].push_back(pinfo);
 	pImpl->outmutex.unlock();
 }
 
-std::vector<PacketInfo*>* ServerUdp::GetPackets()
+std::vector<std::shared_ptr<PacketInfo>>* ServerUdp::GetPackets()
 {
 	pImpl->inmutex.lock();
 
-	std::vector<PacketInfo*>* packets = &pImpl->incoming[pImpl->inflag];
+	auto packets = &pImpl->incoming[pImpl->inflag];
 	pImpl->inflag = !pImpl->inflag;
 
 	pImpl->inmutex.unlock();

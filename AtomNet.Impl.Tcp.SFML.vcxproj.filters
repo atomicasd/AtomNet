@@ -18,10 +18,10 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Implementations\SFML\TcpConnection_SFML.cpp">
+    <ClCompile Include="Implementations\SFML\ServerTcp_SFML.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Implementations\SFML\ServerTcpConnections_SFML.cpp">
+    <ClCompile Include="Implementations\SFML\ClientTcp_SFML.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

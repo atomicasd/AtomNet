@@ -2,6 +2,7 @@
 
 #include "anet/impl/IServerNetwork.h"
 #include <memory>
+
 namespace anet
 {
 	class PacketInfo;
@@ -14,12 +15,15 @@ namespace anet
 		void Update();
 
 		void SendPacket(PacketInfo* pInfo);
-		std::vector<PacketInfo*>* GetPackets();
+
+		std::vector<std::shared_ptr<PacketInfo>>* GetPackets();
 
 		bool DisconnectedSockets();
+
 		std::vector<short> GetDisconnectedSockets();
 
 		bool NewOpenSockets();
+
 		std::vector<short> GetNewOpenSockets();
 
 	private:

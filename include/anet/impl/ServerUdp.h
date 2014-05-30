@@ -14,13 +14,16 @@ namespace anet
 
 		void Update();
 
-		void SendPacket(PacketInfo* pInfo);
-		std::vector<PacketInfo*>* GetPackets();
+		void SendPacket(std::shared_ptr<PacketInfo> pInfo);
+
+		std::vector<std::shared_ptr<PacketInfo>>* GetPackets();
 
 		bool DisconnectedSockets();
+
 		std::vector<short> GetDisconnectedSockets();
 
 		bool NewOpenSockets();
+
 		std::vector<short> GetNewOpenSockets();
 
 	private:
