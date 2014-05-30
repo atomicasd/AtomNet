@@ -28,7 +28,7 @@ namespace anet
 
 		void SendPacket(std::shared_ptr<Packet> packet);
 
-		void ReceivePackets();
+		void Update();
 
 		void RegisterConnectionCallback(std::function<void(bool)> onConnected);
 

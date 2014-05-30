@@ -88,7 +88,7 @@ void ClientConnection::SendPacket(std::shared_ptr<Packet> packet)
 	return pImpl->net_->SendPacket(packet);
 }
 
-void ClientConnection::ReceivePackets()
+void ClientConnection::Update()
 {
 	pImpl->net_->ReceivePackets();
 }

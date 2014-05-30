@@ -90,7 +90,6 @@ void ClientUdp::ReceivePackets()
 
 			case ID_CONNECTION_REQUEST_ACCEPTED:
 				pImpl->callback_(true);
-				std::cout << "Connected through port" << peer->GetMyBoundAddress().GetPort() << std::endl;
 				break;
 
 			case ID_CONNECTION_ATTEMPT_FAILED:

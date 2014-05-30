@@ -254,6 +254,7 @@ std::vector<std::shared_ptr<PacketInfo>>* ServerUdp::GetPackets()
 bool ServerUdp::DisconnectedSockets()
 {
 	std::lock_guard<std::mutex> lock(pImpl->dcmutex);
+
 	return pImpl->hasDisconnectedSockets;
 }
 
