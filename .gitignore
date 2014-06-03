@@ -35,4 +35,4 @@ bin/Release/
 *.orig
 
 lib*/
-lib*/
+extlibs/*

@@ -1,11 +1,10 @@
-#include <anet/impl/ServerUdp.h>
+#include <anet/ServerUdp.h>
 #include <anet/PacketInfo.h>
+#include <anet/impl/SocketContainer.h>
+#include <anet/impl/DoubleBufferedContainer.h>
 
 #include <iostream>
-#include <map>
-#include <mutex>
 #include <memory>
-#include <atomic>
 
 #include "RakPeer.h"
 #include "RakPeerInterface.h"
@@ -18,86 +17,57 @@
 
 using namespace anet;
 
-class ServerUdp::Impl
+class ServerUdp::Impl : public SocketContainer<RakNet::RakNetGUID>
 {
 public:
-	Impl(unsigned short port);
+	Impl(unsigned short port, unsigned short maxplayers);
 	void Update();
 
 public:
 	RakNet::RakPeerInterface *peer_;
 
-	bool hasNewOpenSockets;
-	std::mutex newConMutex;
-	std::vector<short> newOpenSockets;
-
-	bool hasDisconnectedSockets;
-	std::mutex dcmutex;
-	std::vector<short> disconnectedSockets;
-
 public:
-	std::mutex inmutex;
-	std::vector<std::shared_ptr<PacketInfo>> incoming[2];
-	bool inflag;
-
-	std::mutex outmutex;
-	std::vector<std::shared_ptr<PacketInfo>> outgoing[2];
-	bool outflag;
-
-public:
-	std::map<short, RakNet::SystemAddress> connections_;
-	RakNet::SystemAddress* GetSocket(short id);
-	short GetId(RakNet::SystemAddress);
-
-	short AddSocketConnection(RakNet::SystemAddress socket);
-	short RemoveSocketConnection(RakNet::SystemAddress socket);
+	DoubleBufferedContainer<std::shared_ptr<PacketInfo>> incoming_;
+	DoubleBufferedContainer<std::shared_ptr<PacketInfo>> outgoing_;
 };
 
-ServerUdp::Impl::Impl(unsigned short port) :
+ServerUdp::Impl::Impl(unsigned short port, unsigned short maxplayers) :
 	peer_(RakNet::RakPeerInterface::GetInstance())
 {
-
-	inflag = false;
-	outflag = false;
-
-	hasNewOpenSockets = false;
-	hasDisconnectedSockets = false;
 	RakNet::SocketDescriptor sd(port,0);
-	peer_->Startup(35, &sd, 1);
 
+	peer_->Startup(maxplayers, &sd, 1);
 	peer_->SetMaximumIncomingConnections(5);
 	peer_->SetOccasionalPing(true);
-
-	printf("Started listening on port %hu\n", port);
 }
-
 
 void ServerUdp::Impl::Update()
 {
 	//Send
 
-	outmutex.lock();
-	std::vector<std::shared_ptr<PacketInfo>>* packets = &outgoing[outflag];
-	outflag = !outflag;
-	outmutex.unlock();
+	auto packets = outgoing_.Get();
 
 	for(auto it = packets->begin(); it != packets->end(); it++)
 	{
 		PacketInfo* p = it->get();
+		RakNet::RakNetGUID* guid = GetSocket(p->id);
 
-		RakNet::SystemAddress* addr = GetSocket(p->id);
-		if(addr)
+		if (guid)
 		{
-			const char* data = (const char*)p->packet.GetData();
-			const int length = (const int)p->packet.GetDataSize();
-			peer_->Send(data, length, HIGH_PRIORITY, RELIABLE_ORDERED, 0, *addr, false);
+			RakNet::SystemAddress addr = peer_->GetSystemAddressFromGuid(*guid);
+
+			const char* data = (const char*)p->packet->GetData();
+			const int length = (const int)p->packet->GetDataSize();
+
+			RakNet::BitStream bs;
+			bs.Write((RakNet::MessageID)ID_USER_PACKET_ENUM);
+			bs.Write(data, length);
+
+			peer_->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, addr, false);
 		}
 	}
 
-	if (packets->size() > 0)
-	{
-		packets->clear();
-	}
+	packets->clear();
 
 	//Receive
 
@@ -106,50 +76,38 @@ void ServerUdp::Impl::Update()
 	{
 		switch(packet->data[0])
 		{
+			std::cout << packet->data << std::endl;
 			case ID_NEW_INCOMING_CONNECTION:
-				{
-					short id = AddSocketConnection(packet->systemAddress);
-					{
-						std::lock_guard<std::mutex> lock(newConMutex);
-						newOpenSockets.push_back(id);
-						hasNewOpenSockets = true;
-					}
-				}
-
+			{
+				AddSocket(packet->guid);
 				break;
+			}
 
-				case ID_DISCONNECTION_NOTIFICATION:
-				case ID_CONNECTION_LOST:
-					{
-						short id = RemoveSocketConnection(packet->systemAddress);
-						{
-							std::lock_guard<std::mutex> lock(dcmutex);
-							disconnectedSockets.push_back(id);
-							hasDisconnectedSockets = true;
-						}
-					}
+			case ID_CONNECTION_BANNED:
+			case ID_DISCONNECTION_NOTIFICATION:
+			case ID_CONNECTION_LOST:
+			{
+				RemoveSocket(packet->guid);
+				break;
+			}
+			case ID_USER_PACKET_ENUM:
+			{
+				short id = GetId(packet->guid);
+
+				if (id < 0)
 					break;
 
-				case ID_USER_PACKET_ENUM:
-				{
-					short id = GetId(packet->systemAddress);
-												
-					if (id < 0)
-						break;
+				unsigned char* data = packet->data + sizeof(RakNet::MessageID);
+				unsigned int length = packet->length - sizeof(RakNet::MessageID);
 
-					unsigned char* data = packet->data + sizeof(anet::Int8);
-					unsigned int length = packet->length - sizeof(anet::Int8);
+				std::shared_ptr<PacketInfo> pInfo(new PacketInfo(data, length));
 
-					std::shared_ptr<PacketInfo> pInfo(new PacketInfo(data, length));
+				pInfo->id = id;
 
-					pInfo->id = id;
-
-					inmutex.lock();
-					incoming[inflag].push_back(pInfo);
-					inmutex.unlock();
-				}
+				incoming_.Add(pInfo);
 
 				break;
+			}
 					
 			default:
 				break;
@@ -157,67 +115,10 @@ void ServerUdp::Impl::Update()
 	}
 }
 
-RakNet::SystemAddress* ServerUdp::Impl::GetSocket(short id)
-{
-	std::map<short, RakNet::SystemAddress>::iterator it = connections_.find(id);
-
-	if(it != connections_.end())
-		return &it->second;
-
-	return NULL;
-}
-
-short ServerUdp::Impl::GetId(RakNet::SystemAddress socket)
-{
-	for (auto it = connections_.begin(); it != connections_.end(); it++)
-	{
-		if(it->second.systemIndex == socket.systemIndex)
-			return it->first;
-	}
-
-	return -1;
-}
-
-short ServerUdp::Impl::AddSocketConnection(RakNet::SystemAddress socket)
-{
-	short id = 0;
-
-	for(auto it = connections_.begin(); it != connections_.end(); it++)
-	{
-		if(it->first == id)
-		{
-			id++;
-			continue;
-		}
-		else
-		{
-			break;
-		}
-	}
-
-	connections_[id] = socket;
-	return id;
-}
-
-short ServerUdp::Impl::RemoveSocketConnection(RakNet::SystemAddress socket)
-{
-	for (auto it = connections_.begin(); it != connections_.end(); it++)
-	{
-		if(strcmp(it->second.ToString(), it->second.ToString()) == 0 && it->second.GetPort() == socket.GetPort())
-		{
-			short id = it->first;
-			connections_.erase(it);
-			return id;
-		}
-	}
-
-	return -1;
-}
-
 //---
 
-ServerUdp::ServerUdp(unsigned short port)
-	: IServerNetwork(port), pImpl(new ServerUdp::Impl(port))
+ServerUdp::ServerUdp(unsigned short port, unsigned short maxplayers)
+: IServerNetwork(), pImpl(new ServerUdp::Impl(port, maxplayers))
 {
 	
 }
@@ -232,53 +133,32 @@ void ServerUdp::Update()
 	pImpl->Update();
 }
 
-
-void ServerUdp::SendPacket(std::shared_ptr<PacketInfo> pinfo)
+void ServerUdp::SendPacket(std::shared_ptr<PacketInfo> p)
 {
-	pImpl->outmutex.lock();
-	pImpl->outgoing[pImpl->outflag].push_back(pinfo);
-	pImpl->outmutex.unlock();
+	pImpl->outgoing_.Add(p);
 }
 
 std::vector<std::shared_ptr<PacketInfo>>* ServerUdp::GetPackets()
 {
-	pImpl->inmutex.lock();
-
-	auto packets = &pImpl->incoming[pImpl->inflag];
-	pImpl->inflag = !pImpl->inflag;
-
-	pImpl->inmutex.unlock();
-	return packets;
+	return pImpl->outgoing_.Get();
 }
 
-bool ServerUdp::DisconnectedSockets()
+bool ServerUdp::HasNewSockets()
 {
-	std::lock_guard<std::mutex> lock(pImpl->dcmutex);
-
-	return pImpl->hasDisconnectedSockets;
+	return pImpl->HasNewSockets();
 }
 
-std::vector<short> ServerUdp::GetDisconnectedSockets()
+bool ServerUdp::HasRemovedSockets()
 {
-	std::lock_guard<std::mutex> lock(pImpl->dcmutex);
-	pImpl->hasDisconnectedSockets = false;
-	std::vector<short> vec = pImpl->disconnectedSockets;
-	pImpl->disconnectedSockets.clear();
-	return vec;
+	return pImpl->HasRemovedSockets();
 }
 
-bool ServerUdp::NewOpenSockets()
+std::vector<unsigned short> ServerUdp::GetNewSockets()
 {
-	std::lock_guard<std::mutex> lock(pImpl->newConMutex);
-	return pImpl->hasNewOpenSockets;
+	return pImpl->GetNewSockets();
 }
 
-std::vector<short> ServerUdp::GetNewOpenSockets()
+std::vector<unsigned short> ServerUdp::GetRemovedSockets()
 {
-	std::lock_guard<std::mutex> lock(pImpl->newConMutex);
-	pImpl->hasNewOpenSockets = false;
-		
-	std::vector<short> vec = pImpl->newOpenSockets;
-	pImpl->newOpenSockets.clear();
-	return vec;
+	return pImpl->GetRemovedSockets();
 }

@@ -1,0 +1,56 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AtomNet", "Projects\AtomNet.vcxproj", "{FFA64690-AC17-4D57-917E-0CC91E31259B}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AtomNet.Impl.Udp.RakNet", "Projects\AtomNet.Impl.Udp.RakNet.vcxproj", "{C5EADBA2-3903-4209-9D16-6648E156B51F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{FFA64690-AC17-4D57-917E-0CC91E31259B} = {FFA64690-AC17-4D57-917E-0CC91E31259B}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AtomNet.Impl.UPnP.MiniUPnP", "Projects\AtomNet.Impl.UPnP.MiniUPnP.vcxproj", "{310D141A-DCAA-493D-B190-C01A4859B3E3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{FFA64690-AC17-4D57-917E-0CC91E31259B} = {FFA64690-AC17-4D57-917E-0CC91E31259B}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExampleClient", "examples\ExampleClient\ExampleClient.vcxproj", "{B27895C6-EBE0-49EA-A4F1-CF68F0AD3D89}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExampleServer", "examples\ExampleServer\ExampleServer.vcxproj", "{32B15CBF-9AD2-4992-BD10-236AD4B4FA8C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{FFA64690-AC17-4D57-917E-0CC91E31259B} = {FFA64690-AC17-4D57-917E-0CC91E31259B}
+		{C5EADBA2-3903-4209-9D16-6648E156B51F} = {C5EADBA2-3903-4209-9D16-6648E156B51F}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FFA64690-AC17-4D57-917E-0CC91E31259B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{FFA64690-AC17-4D57-917E-0CC91E31259B}.Debug|Win32.Build.0 = Debug|Win32
+		{FFA64690-AC17-4D57-917E-0CC91E31259B}.Release|Win32.ActiveCfg = Release|Win32
+		{FFA64690-AC17-4D57-917E-0CC91E31259B}.Release|Win32.Build.0 = Release|Win32
+		{C5EADBA2-3903-4209-9D16-6648E156B51F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C5EADBA2-3903-4209-9D16-6648E156B51F}.Debug|Win32.Build.0 = Debug|Win32
+		{C5EADBA2-3903-4209-9D16-6648E156B51F}.Release|Win32.ActiveCfg = Release|Win32
+		{C5EADBA2-3903-4209-9D16-6648E156B51F}.Release|Win32.Build.0 = Release|Win32
+		{310D141A-DCAA-493D-B190-C01A4859B3E3}.Debug|Win32.ActiveCfg = Debug|Win32
+		{310D141A-DCAA-493D-B190-C01A4859B3E3}.Debug|Win32.Build.0 = Debug|Win32
+		{310D141A-DCAA-493D-B190-C01A4859B3E3}.Release|Win32.ActiveCfg = Release|Win32
+		{310D141A-DCAA-493D-B190-C01A4859B3E3}.Release|Win32.Build.0 = Release|Win32
+		{B27895C6-EBE0-49EA-A4F1-CF68F0AD3D89}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B27895C6-EBE0-49EA-A4F1-CF68F0AD3D89}.Debug|Win32.Build.0 = Debug|Win32
+		{B27895C6-EBE0-49EA-A4F1-CF68F0AD3D89}.Release|Win32.ActiveCfg = Release|Win32
+		{B27895C6-EBE0-49EA-A4F1-CF68F0AD3D89}.Release|Win32.Build.0 = Release|Win32
+		{32B15CBF-9AD2-4992-BD10-236AD4B4FA8C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{32B15CBF-9AD2-4992-BD10-236AD4B4FA8C}.Debug|Win32.Build.0 = Debug|Win32
+		{32B15CBF-9AD2-4992-BD10-236AD4B4FA8C}.Release|Win32.ActiveCfg = Release|Win32
+		{32B15CBF-9AD2-4992-BD10-236AD4B4FA8C}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

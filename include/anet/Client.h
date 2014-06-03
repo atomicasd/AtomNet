@@ -6,17 +6,20 @@ namespace anet
 {
 	class Process;
 	class Packet;
+	class ClientConnections;
 	class Client
 	{
 	public:
-		Client(short id);
+		Client(short id, anet::ClientConnections* connections);
 		virtual ~Client();
 
-		void AddProcess(int type, std::shared_ptr<Process> process);
+		void AddProcess(std::shared_ptr<Process> process);
 
-		void Removeprocess(int type);
+		void RemoveProcess(int type);
 
 		void HandlePacket(Packet& packet);
+
+		void SendPacket(std::shared_ptr<Packet> packet);
 
 		short GetId() const;
 	private:

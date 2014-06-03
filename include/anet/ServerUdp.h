@@ -9,7 +9,7 @@ namespace anet
 	class ServerUdp : public IServerNetwork
 	{
 	public:
-		ServerUdp(unsigned short port);
+		ServerUdp(unsigned short port, unsigned short maxplayers = 32);
 		virtual ~ServerUdp();
 
 		void Update();
@@ -18,13 +18,13 @@ namespace anet
 
 		std::vector<std::shared_ptr<PacketInfo>>* GetPackets();
 
-		bool DisconnectedSockets();
+		bool HasNewSockets();
 
-		std::vector<short> GetDisconnectedSockets();
+		std::vector<unsigned short> GetNewSockets();
 
-		bool NewOpenSockets();
+		bool HasRemovedSockets();
 
-		std::vector<short> GetNewOpenSockets();
+		std::vector<unsigned short> GetRemovedSockets();
 
 	private:
 		class Impl;

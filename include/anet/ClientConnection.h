@@ -22,17 +22,13 @@ namespace anet
 
 		void Disconnect();
 
-		void AddProcess(int type, std::shared_ptr<Process> process);
+		void AddProcess(std::shared_ptr<Process> process);
 
 		void RemoveProcess(int type);
 
 		void SendPacket(std::shared_ptr<Packet> packet);
 
 		void Update();
-
-		void RegisterConnectionCallback(std::function<void(bool)> onConnected);
-
-		void RemoveConnectionCallback(std::function<void(bool)> onConnected);
 
 	private:
 		class Impl;

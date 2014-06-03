@@ -11,11 +11,6 @@
 
 namespace anet
 {
-	typedef std::function<std::shared_ptr<Client>(std::shared_ptr<Client>)> FuncClientSetup;
-
-	typedef std::function<void(unsigned short id)> ClientConnectedCallback;
-	typedef std::function<void(unsigned short id)> ClientDisconnectedCallback;
-
 	typedef enum Events
 	{
 		CLIENT_CONNECTED,
@@ -48,7 +43,7 @@ namespace anet
 
 	public:
 
-		ClientConnections(FuncClientSetup onCreatedClient, std::shared_ptr<IServerNetwork> implementation);
+		ClientConnections(std::function<std::shared_ptr<Client>(std::shared_ptr<Client>)> onCreatedClient, std::shared_ptr<IServerNetwork> implementation);
 
 		virtual ~ClientConnections();
 
@@ -56,8 +51,8 @@ namespace anet
 
 		void SendPacket(std::shared_ptr<PacketInfo> pInfo);
 
-		std::shared_ptr<FunctionToken> OnClientConnected(ClientConnectedCallback callback);
-		std::shared_ptr<FunctionToken> OnClientDisconnected(ClientDisconnectedCallback callback);
+		std::shared_ptr<FunctionToken> OnClientConnected(std::function<void(unsigned short id)> callback);
+		std::shared_ptr<FunctionToken> OnClientDisconnected(std::function<void(unsigned short id)> callback);
 
 	private:
 		void UnRegisterEvent(int type, unsigned short id);

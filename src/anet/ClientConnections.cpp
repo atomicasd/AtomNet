@@ -3,20 +3,21 @@
 #include <anet/PacketInfo.h>
 #include <anet/Client.h>
 
-#include <boost/signals2.hpp>
-
 #include <thread>
 #include <future>
+
+#include <map>
 #include <unordered_map>
 
 using namespace anet;
+
+typedef std::function<void(unsigned short id)> ClientConnectedCallback;
+typedef std::function<void(unsigned short id)> ClientDisconnectedCallback;
 
 class ClientConnections::Impl
 {
 public:
 	Impl();
-
-	FuncClientSetup onCreatedClient_;
 
 	std::shared_ptr<IServerNetwork> net_;
 
@@ -28,6 +29,7 @@ public:
 
 	unsigned short functionCounter_;
 
+	std::function<std::shared_ptr<Client>(std::shared_ptr<Client>)> onCreatedClient_;
 	
 };
 
@@ -39,7 +41,7 @@ ClientConnections::Impl::Impl()
 //---
 
 ClientConnections::ClientConnections(
-	FuncClientSetup onCreatedClient, 
+	std::function<std::shared_ptr<Client>(std::shared_ptr<Client>)> onCreatedClient,
 	std::shared_ptr<IServerNetwork> implementation) :
 	pImpl(new Impl())
 {
@@ -57,11 +59,11 @@ ClientConnections::~ClientConnections()
 
 void ClientConnections::Update()
 {
-	if(pImpl->net_->NewOpenSockets())
+	if(pImpl->net_->HasNewSockets())
 	{
-		for(short id : pImpl->net_->GetNewOpenSockets())
+		for(short id : pImpl->net_->GetNewSockets())
 		{
-			std::shared_ptr<Client> client(new Client(id));
+			std::shared_ptr<Client> client(new Client(id, this));
 
 			pImpl->connectedClients_[id] = pImpl->onCreatedClient_(client);
 
@@ -72,15 +74,15 @@ void ClientConnections::Update()
 		}
 	}
 
-	if(pImpl->net_->DisconnectedSockets())
+	if(pImpl->net_->HasRemovedSockets())
 	{
-		for(short id : pImpl->net_->GetDisconnectedSockets())
+		for(short id : pImpl->net_->GetRemovedSockets())
 		{
 			auto it = pImpl->connectedClients_.find(id);
 
 			if (it != pImpl->connectedClients_.end())
 			{
-				for (auto func : pImpl->clientConnectedEvents_)
+				for (auto func : pImpl->clientDisconnectedEvents_)
 				{
 					func.second(id);
 				}
@@ -98,7 +100,7 @@ void ClientConnections::Update()
 
 		if (pImpl->connectedClients_.find(pInfo->id) != pImpl->connectedClients_.end())
 		{
-			pImpl->connectedClients_[pInfo->id]->HandlePacket(pInfo->packet);
+			pImpl->connectedClients_[pInfo->id]->HandlePacket(*pInfo->packet);
 		}
 	}
 

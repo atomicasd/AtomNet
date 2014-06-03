@@ -1,4 +1,4 @@
-#include <anet/impl/ClientUdp.h>
+#include <anet/ClientUdp.h>
 
 #include "RakPeer.h"
 #include "RakPeerInterface.h"
@@ -70,22 +70,24 @@ bool ClientUdp::IsConnected()
 void ClientUdp::ReceivePackets()
 {
 	RakNet::Packet *packet;
-	RakNet::RakPeerInterface* peer = pImpl->peer_;
 
-	for (packet=peer->Receive(); packet; peer->DeallocatePacket(packet), packet=peer->Receive())
+	for (packet = pImpl->peer_->Receive(); packet; pImpl->peer_->DeallocatePacket(packet), packet = pImpl->peer_->Receive())
 	{
 		switch (packet->data[0])
 		{
 			case ID_DISCONNECTION_NOTIFICATION:
 				std::cout << "ID_DISCONNECTION_NOTIFICATION" << std::endl;
+				pImpl->callback_(false);
 				break;
 
 			case ID_CONNECTION_LOST:
 				std::cout << "ID_CONNECTION_LOST" << std::endl;
+				pImpl->callback_(false);
 				break;
 
 			case ID_NO_FREE_INCOMING_CONNECTIONS:
 				std::cout << "ID_NO_FREE_INCOMING_CONNECTIONS" << std::endl;
+				pImpl->callback_(false);
 				break;
 
 			case ID_CONNECTION_REQUEST_ACCEPTED:
@@ -96,10 +98,11 @@ void ClientUdp::ReceivePackets()
 				pImpl->callback_(false);
 				break;
 
-			case ID_GAME_MESSAGE_1:
+			case ID_USER_PACKET_ENUM:
 			{
-				unsigned char* data = packet->data + sizeof(int);
-				unsigned int length = packet->length - sizeof(int);
+				unsigned char* data = packet->data + sizeof(RakNet::MessageID);
+
+				unsigned int length = packet->length - sizeof(RakNet::MessageID);
 
 				std::shared_ptr<Packet> anetpacket(new Packet(data, length));
 				packets.push_back(anetpacket);
@@ -107,7 +110,6 @@ void ClientUdp::ReceivePackets()
 			}
 
 			default:
-				std::cout << packet->data[0] << std::endl;
 				break;
 		}
 	}
@@ -123,8 +125,7 @@ void ClientUdp::SendPacket(std::shared_ptr<Packet> packet)
 	const int length = (const int)packet->GetDataSize();
 
 	RakNet::BitStream bs;
-	RakNet::MessageID messageId = ID_USER_PACKET_ENUM;
-	bs.Write(messageId);
+	bs.Write((RakNet::MessageID)ID_USER_PACKET_ENUM);
 	bs.Write(data, length);
 
 	pImpl->peer_->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, addr, false);

@@ -6,13 +6,17 @@ namespace anet
 	class Process
 	{
 	public:
-		Process(int type) : type_(type) {};
+		Process(int type) 
+		: type_(type) {};
 
 		virtual ~Process() {};
 
-		virtual void Start() = 0;
-
 		virtual void HandlePacket(Packet& packet) = 0;
+
+		int GetType()
+		{
+			return type_;
+		}
 	private:
 		int type_;
 	};

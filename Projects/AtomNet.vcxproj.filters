@@ -18,60 +18,66 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\anet\Packet.h">
+    <ClInclude Include="..\include\anet\Client.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\anet\PacketInfo.h">
+    <ClInclude Include="..\include\anet\ClientConnection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\anet\ClientConnections.h">
+    <ClInclude Include="..\include\anet\ClientConnections.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\anet\Client.h">
+    <ClInclude Include="..\include\anet\ConnectionTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\anet\Process.h">
+    <ClInclude Include="..\include\anet\Packet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\anet\ClientConnection.h">
+    <ClInclude Include="..\include\anet\PacketInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\anet\ConnectionTypes.h">
+    <ClInclude Include="..\include\anet\Process.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\anet\UPnP.h">
+    <ClInclude Include="..\include\anet\UPnP.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\anet\impl\IClientNetwork.h">
+    <ClInclude Include="..\include\anet\impl\DoubleBufferedContainer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\anet\impl\IServerNetwork.h">
+    <ClInclude Include="..\include\anet\impl\IClientNetwork.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\anet\impl\ServerTcp.h">
+    <ClInclude Include="..\include\anet\impl\IServerNetwork.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\anet\impl\ServerUdp.h">
+    <ClInclude Include="..\include\anet\impl\SocketContainer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\anet\impl\ClientTcp.h">
+    <ClInclude Include="..\include\anet\ClientTcp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\anet\impl\ClientUdp.h">
+    <ClInclude Include="..\include\anet\ClientUdp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\anet\ServerTcp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\anet\ServerUdp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\anet\ClientConnections.cpp">
+    <ClCompile Include="..\src\anet\Client.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\anet\Client.cpp">
+    <ClCompile Include="..\src\anet\ClientConnection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\anet\ClientConnection.cpp">
+    <ClCompile Include="..\src\anet\ClientConnections.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\anet\Packet.cpp">
+    <ClCompile Include="..\src\anet\Packet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

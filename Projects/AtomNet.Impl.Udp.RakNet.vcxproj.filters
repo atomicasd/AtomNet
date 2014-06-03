@@ -18,8 +18,16 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Implementations\MiniUPnP\UPnP_miniupnp.cpp">
+    <ClCompile Include="..\Implementations\RakNet\ServerUdp_RakNet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\Implementations\RakNet\ClientUdp_RakNet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Implementations\RakNet\UdpMessages.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

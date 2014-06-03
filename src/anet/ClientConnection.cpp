@@ -1,9 +1,8 @@
-#include "anet/ClientConnection.h"
-#include "anet/impl/IClientNetwork.h"
+#include <anet/ClientConnection.h>
+#include <anet/impl/IClientNetwork.h>
 #include <anet/ConnectionTypes.h>
 #include <memory>
 #include <assert.h>
-#include <boost/signals2.hpp>
 #include <map>
 using namespace anet;
 
@@ -16,12 +15,8 @@ public:
 
 	char* ip_;
 	unsigned short port_;
-	ConnectionType type_;
-
-	boost::signals2::signal<void(bool)> sigClientConnected_;
-	boost::signals2::signal<void(bool)> sigClientDisconnected_;
-	std::vector<boost::signals2::connection> sigConnections_;
-
+	bool type_;
+	
 	void ConnectionResultCallback(bool result);
 
 	std::map<int, std::shared_ptr<Process>> processes_;
@@ -36,7 +31,7 @@ ClientConnection::Impl::Impl()
 
 void ClientConnection::Impl::ConnectionResultCallback(bool connected)
 {
-	sigClientConnected_(connected);
+
 }
 
 ClientConnection::ClientConnection(std::shared_ptr<IClientNetwork> implementation)
@@ -68,9 +63,9 @@ void ClientConnection::Disconnect()
 	pImpl->net_->Disconnect();
 }
 
-void ClientConnection::AddProcess(int type, std::shared_ptr<Process> process)
+void ClientConnection::AddProcess(std::shared_ptr<Process> process)
 {
-	pImpl->processes_[type] = process;
+	pImpl->processes_[process->GetType()] = process;
 }
 
 void ClientConnection::RemoveProcess(int type)
@@ -91,14 +86,21 @@ void ClientConnection::SendPacket(std::shared_ptr<Packet> packet)
 void ClientConnection::Update()
 {
 	pImpl->net_->ReceivePackets();
-}
 
-void ClientConnection::RegisterConnectionCallback(std::function<void(bool)> onConnected)
-{
-	pImpl->sigConnections_.push_back(pImpl->sigClientConnected_.connect(onConnected));
-}
+	auto packets = pImpl->net_->packets;
 
-void ClientConnection::RemoveConnectionCallback(std::function<void(bool)> onConnected)
-{
-	//Todo, Implement a disconnect callback method
+	for (auto it = packets.begin(); it != packets.end(); it++)
+	{
+		int type;
+		*it->get() >> type;
+
+		std::map<int, std::shared_ptr<Process>>::iterator proc = pImpl->processes_.find(type);
+
+		if (proc != pImpl->processes_.end())
+		{
+			proc->second->HandlePacket(*it->get());
+		}
+	}
+
+	packets.clear();
 }
