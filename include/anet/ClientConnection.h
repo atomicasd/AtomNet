@@ -13,7 +13,7 @@ namespace anet
 	class ClientConnection
 	{
 	public:
-		ClientConnection(std::shared_ptr<IClientNetwork> implementation);
+		ClientConnection(IClientNetwork& implementation);
 		virtual ~ClientConnection();
 
 		void SetHost(char* ip, unsigned short port);
@@ -22,11 +22,11 @@ namespace anet
 
 		void Disconnect();
 
-		void AddProcess(std::shared_ptr<Process> process);
+		void AddProcess(Process& process);
 
 		void RemoveProcess(int type);
 
-		void SendPacket(std::shared_ptr<Packet> packet);
+		void SendPacket(Packet& packet);
 
 		void Update();
 

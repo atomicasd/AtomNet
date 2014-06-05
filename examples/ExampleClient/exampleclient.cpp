@@ -24,7 +24,7 @@ typedef enum Processes
 class Login : public anet::Process
 {
 public:
-	Login(anet::ClientConnection* connection)
+	Login(anet::ClientConnection& connection)
 		: Process(Processes::LOGIN),
 		connection_(connection)
 	{
@@ -40,17 +40,17 @@ public:
 		{
 			printf("SERVER: %s\n", message.c_str());
 
-			std::shared_ptr<anet::Packet> cretentials(new anet::Packet());
+			anet::Packet cretentials;
 
-			*cretentials.get() << Processes::LOGIN;
+			cretentials << Processes::LOGIN;
 
-			*cretentials.get() << "credentials";
+			cretentials << "credentials";
 
-			*cretentials.get() << "username";
+			cretentials << "username";
 
-			*cretentials.get() << "password";
+			cretentials << "password";
 
-			connection_->SendPacket(cretentials);
+			connection_.SendPacket(cretentials);
 		}
 		else if (message.compare("welcome") == 0)
 		{
@@ -59,20 +59,20 @@ public:
 
 			printf("SERVER: %s %s\n", message.c_str(), username.c_str());
 
-			std::shared_ptr<anet::Packet> bye(new anet::Packet());
+			anet::Packet bye;
 
-			*bye.get() << Processes::LOGIN;
+			bye << Processes::LOGIN;
 
-			*bye.get() >> "bye";
+			bye << "bye";
 
-			connection_->SendPacket(bye);
+			connection_.SendPacket(bye);
 
-			connection_->Disconnect();
+			connection_.Disconnect();
 		}
 	}
 
 private:
-	anet::ClientConnection* connection_;
+	anet::ClientConnection& connection_;
 };
 static bool connected = true;
 
@@ -88,14 +88,14 @@ int main()
 {
 	Sleep(1000);
 
-	std::shared_ptr<anet::ClientUdp> udp(new anet::ClientUdp(OnConnectionResult));
+	anet::ClientUdp udp(OnConnectionResult);
+
 	anet::ClientConnection connection(udp);
 
 	connection.SetHost("127.0.0.1", 9000);
 	connection.Connect();
 
-	std::shared_ptr<anet::Process> login(new Login(&connection));
-
+	Login login(connection);
 	connection.AddProcess(login);
 
 	while (connected)

@@ -19,7 +19,7 @@ namespace anet
 
 		void HandlePacket(Packet& packet);
 
-		void SendPacket(std::shared_ptr<Packet> packet);
+		void SendPacket(Packet& packet);
 
 		short GetId() const;
 	private:

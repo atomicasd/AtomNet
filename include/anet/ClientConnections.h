@@ -43,7 +43,7 @@ namespace anet
 
 	public:
 
-		ClientConnections(std::function<std::shared_ptr<Client>(std::shared_ptr<Client>)> onCreatedClient, std::shared_ptr<IServerNetwork> implementation);
+		ClientConnections(std::function<Client&(Client&)> onCreatedClient, IServerNetwork& implementation);
 
 		virtual ~ClientConnections();
 

@@ -20,7 +20,7 @@ namespace anet
 
 		virtual bool IsConnected() = 0;
 
-		virtual void SendPacket(std::shared_ptr<Packet> packet) = 0;
+		virtual void SendPacket(Packet& packet) = 0;
 
 		virtual void ReceivePackets() = 0;
 

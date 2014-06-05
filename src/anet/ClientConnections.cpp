@@ -17,9 +17,9 @@ typedef std::function<void(unsigned short id)> ClientDisconnectedCallback;
 class ClientConnections::Impl
 {
 public:
-	Impl();
+	Impl(IServerNetwork& implementation);
 
-	std::shared_ptr<IServerNetwork> net_;
+	IServerNetwork& net_;
 
 	std::unordered_map<unsigned short, std::shared_ptr<Client>> connectedClients_;
 
@@ -29,11 +29,12 @@ public:
 
 	unsigned short functionCounter_;
 
-	std::function<std::shared_ptr<Client>(std::shared_ptr<Client>)> onCreatedClient_;
+	std::function<Client&(Client&)> onCreatedClient_;
 	
 };
 
-ClientConnections::Impl::Impl()
+ClientConnections::Impl::Impl(IServerNetwork& implementation) :
+net_(implementation)
 {
 
 }
@@ -41,13 +42,11 @@ ClientConnections::Impl::Impl()
 //---
 
 ClientConnections::ClientConnections(
-	std::function<std::shared_ptr<Client>(std::shared_ptr<Client>)> onCreatedClient,
-	std::shared_ptr<IServerNetwork> implementation) :
-	pImpl(new Impl())
+	std::function<Client&(Client&)> onCreatedClient,
+	IServerNetwork& implementation) :
+	pImpl(new Impl(implementation))
 {
 	pImpl->onCreatedClient_ = onCreatedClient;
-
-	pImpl->net_ = implementation;
 
 	pImpl->functionCounter_ = 0;
 }
@@ -59,13 +58,13 @@ ClientConnections::~ClientConnections()
 
 void ClientConnections::Update()
 {
-	if(pImpl->net_->HasNewSockets())
+	if(pImpl->net_.HasNewSockets())
 	{
-		for(short id : pImpl->net_->GetNewSockets())
+		for(short id : pImpl->net_.GetNewSockets())
 		{
-			std::shared_ptr<Client> client(new Client(id, this));
+			Client* client = new Client(id, this);
 
-			pImpl->connectedClients_[id] = pImpl->onCreatedClient_(client);
+			pImpl->connectedClients_[id] = std::shared_ptr<Client>(&pImpl->onCreatedClient_(*client));
 
 			for (auto func : pImpl->clientConnectedEvents_)
 			{
@@ -74,9 +73,9 @@ void ClientConnections::Update()
 		}
 	}
 
-	if(pImpl->net_->HasRemovedSockets())
+	if(pImpl->net_.HasRemovedSockets())
 	{
-		for(short id : pImpl->net_->GetRemovedSockets())
+		for(short id : pImpl->net_.GetRemovedSockets())
 		{
 			auto it = pImpl->connectedClients_.find(id);
 
@@ -92,7 +91,7 @@ void ClientConnections::Update()
 		}
 	}
 
-	auto packets = pImpl->net_->GetPackets();
+	auto packets = pImpl->net_.GetPackets();
 
 	for (auto it = packets->begin(); it != packets->end(); it++)
 	{
@@ -103,13 +102,11 @@ void ClientConnections::Update()
 			pImpl->connectedClients_[pInfo->id]->HandlePacket(*pInfo->packet);
 		}
 	}
-
-	packets->clear();
 }
 
 void ClientConnections::SendPacket(std::shared_ptr<PacketInfo> pInfo)
 {
-	pImpl->net_->SendPacket(pInfo);
+	pImpl->net_.SendPacket(pInfo);
 }
 
 std::shared_ptr<ClientConnections::FunctionToken> ClientConnections::OnClientConnected(ClientConnectedCallback callback)

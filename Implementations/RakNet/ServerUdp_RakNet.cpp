@@ -140,7 +140,9 @@ void ServerUdp::SendPacket(std::shared_ptr<PacketInfo> p)
 
 std::vector<std::shared_ptr<PacketInfo>>* ServerUdp::GetPackets()
 {
-	return pImpl->outgoing_.Get();
+	std::vector<std::shared_ptr<PacketInfo>>* packets = pImpl->incoming_.Get();
+
+	return packets;
 }
 
 bool ServerUdp::HasNewSockets()

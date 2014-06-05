@@ -19,7 +19,7 @@ namespace anet
 
 		bool IsConnected();
 
-		void SendPacket(std::shared_ptr<Packet> packet);
+		void SendPacket(Packet& packet);
 
 		void ReceivePackets();
 

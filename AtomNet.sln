@@ -16,6 +16,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AtomNet.Impl.UPnP.MiniUPnP"
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExampleClient", "examples\ExampleClient\ExampleClient.vcxproj", "{B27895C6-EBE0-49EA-A4F1-CF68F0AD3D89}"
+	ProjectSection(ProjectDependencies) = postProject
+		{FFA64690-AC17-4D57-917E-0CC91E31259B} = {FFA64690-AC17-4D57-917E-0CC91E31259B}
+		{C5EADBA2-3903-4209-9D16-6648E156B51F} = {C5EADBA2-3903-4209-9D16-6648E156B51F}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExampleServer", "examples\ExampleServer\ExampleServer.vcxproj", "{32B15CBF-9AD2-4992-BD10-236AD4B4FA8C}"
 	ProjectSection(ProjectDependencies) = postProject

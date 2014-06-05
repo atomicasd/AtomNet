@@ -16,11 +16,13 @@ public:
 	{
 		mutex_.lock();
 
+		std::vector<T>* container = &container_[!flag_];
+
 		flag_ = !flag_;
 
 		mutex_.unlock();
 
-		return &container_[flag_];
+		return container;
 	}
 
 	void Add(T item)

@@ -69,8 +69,10 @@ void Client::HandlePacket(Packet& packet)
 	}
 }
 
-void Client::SendPacket(std::shared_ptr<Packet> packet)
+void Client::SendPacket(Packet& p)
 {
+	std::shared_ptr<Packet> packet(new Packet(p));
+
 	std::shared_ptr<PacketInfo> pInfo(new PacketInfo(packet));
 
 	pInfo->id = pImpl->id_;

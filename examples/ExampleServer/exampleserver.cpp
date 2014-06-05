@@ -24,7 +24,7 @@ typedef enum Processes
 class Login : public anet::Process
 {
 public:
-	Login(std::shared_ptr<anet::Client> client)
+	Login(anet::Client& client)
 		: Process(Processes::LOGIN),
 		client_(client)
 	{
@@ -33,13 +33,13 @@ public:
 
 	void SendHello()
 	{
-		std::shared_ptr<anet::Packet> hello(new anet::Packet());
+		anet::Packet hello;
 
-		*hello.get() << Processes::LOGIN;
+		hello << Processes::LOGIN;
 
-		*hello.get() << "hello";
+		hello << "hello";
 
-		client_->SendPacket(hello);
+		client_.SendPacket(hello);
 	}
 
 	void HandlePacket(anet::Packet& packet)
@@ -56,15 +56,15 @@ public:
 
 			printf("CLIENT: %s %s\n", username.c_str(), password.c_str());
 
-			std::shared_ptr<anet::Packet> welcome(new anet::Packet());
+			anet::Packet welcome;
 
-			*welcome.get() << Processes::LOGIN;
+			welcome << Processes::LOGIN;
 
-			*welcome.get() << "welcome";
+			welcome << "welcome";
 
-			*welcome.get() << username;
+			welcome << username;
 
-			client_->SendPacket(welcome);
+			client_.SendPacket(welcome);
 		}
 		else if (message.compare("bye") == 0)
 		{
@@ -74,18 +74,15 @@ public:
 	}
 
 private:
-	std::shared_ptr<anet::Client> client_;
+	anet::Client& client_;
 };
 
 static bool connected = true;
-static anet::ClientConnections *connections;
 
-std::shared_ptr<anet::Client> OnCreatedClient(std::shared_ptr<anet::Client> client)
+anet::Client& OnCreatedClient(anet::Client& client)
 {
 	std::shared_ptr<Login> login(new Login(client));
-
-	client->AddProcess(login);
-
+	client.AddProcess(login);
 	login->SendHello();
 
 	return client;
@@ -103,21 +100,21 @@ void OnClientDisconnected(unsigned short id)
 
 int main()
 {
-	std::shared_ptr<anet::ServerUdp> udp(new anet::ServerUdp(9000, 32));
-	connections = new anet::ClientConnections(OnCreatedClient, udp);
+	anet::ServerUdp udp(9000, 32);
+	anet::ClientConnections connections(OnCreatedClient, udp);
 
 	//Functions will automatically unregister when tokens go out of scope
 
-	auto functoken = connections->OnClientConnected(OnClientConnected);
-	auto functoken2 = connections->OnClientDisconnected(OnClientDisconnected);
+	auto functoken = connections.OnClientConnected(OnClientConnected);
+	auto functoken2 = connections.OnClientDisconnected(OnClientDisconnected);
 
 	while (connected)
 	{
 		Sleep(10);
 
-		udp->Update();
+		udp.Update();
 
-		connections->Update();
+		connections.Update();
 	}
 
 	return 0;

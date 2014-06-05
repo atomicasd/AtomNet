@@ -115,14 +115,14 @@ void ClientUdp::ReceivePackets()
 	}
 }
 
-void ClientUdp::SendPacket(std::shared_ptr<Packet> packet)
+void ClientUdp::SendPacket(Packet& packet)
 {
 	RakNet::SystemAddress addr;
 	addr.FromString(pImpl->ip_);
 	addr.SetPortHostOrder(pImpl->port_);
 
-	const char* data = (const char*)packet->GetData();
-	const int length = (const int)packet->GetDataSize();
+	const char* data = (const char*)packet.GetData();
+	const int length = (const int)packet.GetDataSize();
 
 	RakNet::BitStream bs;
 	bs.Write((RakNet::MessageID)ID_USER_PACKET_ENUM);

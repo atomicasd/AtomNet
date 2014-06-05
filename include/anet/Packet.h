@@ -31,6 +31,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace anet
 {
@@ -61,6 +62,7 @@ namespace anet
 
 	public :
 		Packet();
+		Packet(Packet& packet);
 		Packet(const void* data, size_t size);
 
 		virtual ~Packet();
@@ -108,12 +110,17 @@ namespace anet
 		Packet& operator <<(const wchar_t*      data);
 		Packet& operator <<(const std::wstring& data);
 
+		struct Data
+		{
+			std::vector<char> data;
+			std::size_t readPos;
+			bool isValid;
+		};
+
 	private :
 
 		bool CheckSize(std::size_t size);
 
-		std::vector<char> m_data;
-		std::size_t m_readPos;
-		bool m_isValid;
+		std::shared_ptr<Data> data_;
 };
 }

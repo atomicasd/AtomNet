@@ -37,9 +37,15 @@
 #include <WinSock2.h>
 using namespace anet;
 
-Packet::Packet(): 
-m_readPos(0),
-m_isValid(true)
+Packet::Packet() :
+data_(new Data())
+{
+	data_->readPos = 0;
+	data_->isValid = true;
+}
+
+Packet::Packet(Packet& packet) :
+data_(packet.data_)
 {
 
 }
@@ -59,9 +65,9 @@ void Packet::Append(const void* data, std::size_t sizeInBytes)
 {
 	if (data && (sizeInBytes > 0))
 	{
-		std::size_t start = m_data.size();
-		m_data.resize(start + sizeInBytes);
-		std::memcpy(&m_data[start], data, sizeInBytes);
+		std::size_t start = data_->data.size();
+		data_->data.resize(start + sizeInBytes);
+		std::memcpy(&data_->data[start], data, sizeInBytes);
 	}
 }
 
@@ -69,37 +75,37 @@ void Packet::Append(const void* data, std::size_t sizeInBytes)
 ////////////////////////////////////////////////////////////
 void Packet::Clear()
 {
-	m_data.clear();
-	m_readPos = 0;
-	m_isValid = true;
+	data_->data.clear();
+	data_->readPos = 0;
+	data_->isValid = true;
 }
 
 
 ////////////////////////////////////////////////////////////
 const void* Packet::GetData() const
 {
-	return !m_data.empty() ? &m_data[0] : NULL;
+	return !data_->data.empty() ? &data_->data[0] : NULL;
 }
 
 
 ////////////////////////////////////////////////////////////
 std::size_t Packet::GetDataSize() const
 {
-	return m_data.size();
+	return data_->data.size();
 }
 
 
 ////////////////////////////////////////////////////////////
 bool Packet::EndOfPacket() const
 {
-	return m_readPos >= m_data.size();
+	return data_->readPos >= data_->data.size();
 }
 
 
 ////////////////////////////////////////////////////////////
 Packet::operator BoolType() const
 {
-	return m_isValid ? &Packet::CheckSize : NULL;
+	return data_->isValid ? &Packet::CheckSize : NULL;
 }
 
 
@@ -119,8 +125,8 @@ Packet& Packet::operator >>(Int8& data)
 {
 	if (CheckSize(sizeof(data)))
 	{
-		data = *reinterpret_cast<const Int8*>(&m_data[m_readPos]);
-		m_readPos += sizeof(data);
+		data = *reinterpret_cast<const Int8*>(&data_->data[data_->readPos]);
+		data_->readPos += sizeof(data);
 	}
 
 	return *this;
@@ -132,8 +138,8 @@ Packet& Packet::operator >>(Uint8& data)
 {
 	if (CheckSize(sizeof(data)))
 	{
-		data = *reinterpret_cast<const Uint8*>(&m_data[m_readPos]);
-		m_readPos += sizeof(data);
+		data = *reinterpret_cast<const Uint8*>(&data_->data[data_->readPos]);
+		data_->readPos += sizeof(data);
 	}
 
 	return *this;
@@ -145,8 +151,8 @@ Packet& Packet::operator >>(Int16& data)
 {
 	if (CheckSize(sizeof(data)))
 	{
-		data = ntohs(*reinterpret_cast<const Int16*>(&m_data[m_readPos]));
-		m_readPos += sizeof(data);
+		data = ntohs(*reinterpret_cast<const Int16*>(&data_->data[data_->readPos]));
+		data_->readPos += sizeof(data);
 	}
 
 	return *this;
@@ -158,8 +164,8 @@ Packet& Packet::operator >>(Uint16& data)
 {
 	if (CheckSize(sizeof(data)))
 	{
-		data = ntohs(*reinterpret_cast<const Uint16*>(&m_data[m_readPos]));
-		m_readPos += sizeof(data);
+		data = ntohs(*reinterpret_cast<const Uint16*>(&data_->data[data_->readPos]));
+		data_->readPos += sizeof(data);
 	}
 
 	return *this;
@@ -171,8 +177,8 @@ Packet& Packet::operator >>(Int32& data)
 {
 	if (CheckSize(sizeof(data)))
 	{
-		data = ntohl(*reinterpret_cast<const Int32*>(&m_data[m_readPos]));
-		m_readPos += sizeof(data);
+		data = ntohl(*reinterpret_cast<const Int32*>(&data_->data[data_->readPos]));
+		data_->readPos += sizeof(data);
 	}
 
 	return *this;
@@ -184,8 +190,8 @@ Packet& Packet::operator >>(Uint32& data)
 {
 	if (CheckSize(sizeof(data)))
 	{
-		data = ntohl(*reinterpret_cast<const Uint32*>(&m_data[m_readPos]));
-		m_readPos += sizeof(data);
+		data = ntohl(*reinterpret_cast<const Uint32*>(&data_->data[data_->readPos]));
+		data_->readPos += sizeof(data);
 	}
 
 	return *this;
@@ -197,8 +203,8 @@ Packet& Packet::operator >>(float& data)
 {
 	if (CheckSize(sizeof(data)))
 	{
-		data = *reinterpret_cast<const float*>(&m_data[m_readPos]);
-		m_readPos += sizeof(data);
+		data = *reinterpret_cast<const float*>(&data_->data[data_->readPos]);
+		data_->readPos += sizeof(data);
 	}
 
 	return *this;
@@ -210,8 +216,8 @@ Packet& Packet::operator >>(double& data)
 {
 	if (CheckSize(sizeof(data)))
 	{
-		data = *reinterpret_cast<const double*>(&m_data[m_readPos]);
-		m_readPos += sizeof(data);
+		data = *reinterpret_cast<const double*>(&data_->data[data_->readPos]);
+		data_->readPos += sizeof(data);
 	}
 
 	return *this;
@@ -228,11 +234,11 @@ Packet& Packet::operator >>(char* data)
 	if ((length > 0) && CheckSize(length))
 	{
 		// Then extract characters
-		std::memcpy(data, &m_data[m_readPos], length);
+		std::memcpy(data, &data_->data[data_->readPos], length);
 		data[length] = '\0';
 
 		// Update reading position
-		m_readPos += length;
+		data_->readPos += length;
 	}
 
 	return *this;
@@ -250,10 +256,10 @@ Packet& Packet::operator >>(std::string& data)
 	if ((length > 0) && CheckSize(length))
 	{
 		// Then extract characters
-		data.assign(&m_data[m_readPos], length);
+		data.assign(&data_->data[data_->readPos], length);
 
 		// Update reading position
-		m_readPos += length;
+		data_->readPos += length;
 	}
 
 	return *this;
@@ -446,7 +452,7 @@ Packet& Packet::operator <<(const std::wstring& data)
 ////////////////////////////////////////////////////////////
 bool Packet::CheckSize(std::size_t size)
 {
-	m_isValid = m_isValid && (m_readPos + size <= m_data.size());
+	data_->isValid = data_->isValid && (data_->readPos + size <= data_->data.size());
 
-	return m_isValid;
+	return data_->isValid;
 }
